@@ -20,11 +20,30 @@ Iteration 1:
     estimate: 0
     title: Accept multiple connections
   - !ruby/object:Story 
-    completed: false
+    completed: true
     description: |-
-      Remove test mirroring logic.
+      Remove test echoing logic.
       
-      Interpret JOIN and PART messages (RFC 1459), associate the user to a channel.
+      Wait USER and NICK commands to set logged in state.
+    estimate: 0
+    title: User login as per RFC 1549.
+  - !ruby/object:Story 
+    completed: false
+    description: "Return\n\n\
+      :localhost. 431  :No nickname given\n\n\
+      as per the RFC."
+    estimate: 0
+    title: Return error for bad NICK
+  - !ruby/object:Story 
+    completed: false
+    description: "Return\n\n\
+      :localhost. 461 * USER :Not enough parameters\n\n\
+      as per RFC."
+    estimate: 0
+    title: Return error for bad USER
+  - !ruby/object:Story 
+    completed: false
+    description: Interpret JOIN and PART messages (RFC 1459), associate the user to a channel.
     estimate: 0
     title: Join and part channels, as RFC 1549
   - !ruby/object:Story 

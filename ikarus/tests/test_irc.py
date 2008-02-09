@@ -41,11 +41,19 @@ class IRCTestCase(unittest.TestCase):
     def testInstantiate(self):
         self.failIfEqual(self.i, None)
 
-    def testNickChange(self):
+    def testSetNick(self):
         self.i.lineReceived("NICK orospakr")
         self.failUnlessEqual(self.i.nick, "orospakr")
         self.i.lineReceived("NICK smartyman")
         self.failUnlessEqual(self.i.nick, "smartyman")
+
+    def testMalformedSetNick(self):
+        '''ANDREW START HERE AND LEARN WHAT THE DEAL IS WITH ERRBACKS'''
+        pass
+
+    def testSetUser(self):
+        self.i.lineReceived("USER orospakr orospakrshostname localhost :Andrew Clunis")
+        self.failUnlessEqual(self.i.user_name, "orospakr")
 
     def testConnectionOpened(self):
         self.i.lineReceived("NICK orospakr")
