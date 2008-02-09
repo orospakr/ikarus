@@ -15,7 +15,7 @@ Iteration 1:
     estimate: 0
     title: Accept a connection
   - !ruby/object:Story 
-    completed: false
+    completed: true
     description: Mirror the users' messages to all others.
     estimate: 0
     title: Accept multiple connections
@@ -78,4 +78,4 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 0
     title: Daemon
-  :selected: 0
+  :selected: 1

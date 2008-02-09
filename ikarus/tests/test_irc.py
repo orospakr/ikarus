@@ -5,6 +5,8 @@ import twisted.internet
 import twisted.internet.reactor
 
 import ikarus.irc
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 class IRCTestCase(unittest.TestCase):
     def setUp(self):
@@ -20,14 +22,24 @@ class IRCTestCase(unittest.TestCase):
         #self.i.makeConnection(self.i)
         #self.f.protocl = ikarus.irc.IRC
 
-
     def testInstantiate(self):
         self.failIfEqual(self.i, None)
 
     def testEcho(self):
         self.i.lineReceived("whee")
         #twisted.internet.reactor.iterate()
-        self.assertEquals(self.tr.value(), "whee\r\n")
+        logging.debug(self.tr.value().split())
+        self.assertEquals(self.tr.value().split()[1], "whee")
+
+    def testAllEcho(self):
+        self.i2 = self.factory.buildProtocol(('127.0.0.1', 6667))
+        self.tr2 = proto_helpers.StringTransport()
+        self.i2.makeConnection(self.tr2)
+
+        self.i.lineReceived("omgwtfbbq")
+        # here, the string transport's buffer only contains the outgoing message
+        # because the incoming message wasn't typed in on this session.
+        self.assertEquals(self.tr2.value(), "omgwtfbbq\r\n")
 
 #     def testNickChange(self):
 #         i.lineReceived("NICK orospakr")

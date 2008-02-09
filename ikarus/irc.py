@@ -12,10 +12,15 @@ class IRC(twisted.protocols.basic.LineReceiver):
         #self.nick = line.split()[1]
         #self.se(line)
         self.sendLine(line)
-        pass
+        for user in self.factory.users:
+            user.sendLine(line)
 
     def connectionMade(self):
-        pass
+        self.factory.register_user(self)
 
 class IRCFactory(twisted.internet.protocol.Factory):
     protocol = IRC
+    users = []
+
+    def register_user(self, user):
+        self.users.append(user)
