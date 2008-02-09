@@ -6,7 +6,6 @@ import twisted.internet.reactor
 
 import ikarus.irc
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
 class IRCTestCase(unittest.TestCase):
     def setUp(self):
