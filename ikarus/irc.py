@@ -1,0 +1,2 @@
+class IRC(object):
+    pass

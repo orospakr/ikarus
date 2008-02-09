@@ -1,0 +1,81 @@
+--- 
+iterations: 
+  :list: 
+  - !ruby/object:Iteration 
+    end: ""
+    name: Iteration 1
+    start: ""
+    velocity: 0.0
+  :selected: 0
+Iteration 1: 
+  :list: 
+  - !ruby/object:Story 
+    completed: true
+    description: Open a socket, and mirror the user's messages.
+    estimate: 0
+    title: Accept a connection
+  - !ruby/object:Story 
+    completed: true
+    description: Mirror the users' messages to all others.
+    estimate: 0
+    title: Accept multiple connections
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      Remove test mirroring logic.
+      
+      Interpret JOIN and PART messages (RFC 1459), associate the user to a channel.
+    estimate: 0
+    title: Join and part channels, as RFC 1549
+  - !ruby/object:Story 
+    completed: false
+    description: "Interpret PRIVMSG, and transmit the text to the other users in the channel provided by the first argument.\n\n\
+      Speaker sends:\n\n\
+      PRIVMSG #mychannel :whee.\n\n\
+      All other users see (but not the original sender):\n\n\
+      :orospakr!~orospakr@localhost. PRIVMSG #mychannel :whee.\n\n"
+    estimate: 0
+    title: Channel message
+  - !ruby/object:Story 
+    completed: false
+    description: "Reply to PING packets with the standard reply as per the RFC.\n\n\
+      Sender transmits:\n\n\
+      PING localhost.\n\n\
+      :localhost. PONG localhost. :someotherguy"
+    estimate: 0
+    title: Ping? PONG!!!11
+  - !ruby/object:Story 
+    completed: false
+    description: Allow users to register a permanent account by means of `/msg nickserv register`.
+    estimate: 0
+    title: Account registration
+  - !ruby/object:Story 
+    completed: false
+    description: Allow user to login by means of PASS, or by means of /msg nickserv identify.
+    estimate: 0
+    title: Account login
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      Remember users nicknames and passwords for authentication.
+      
+      If a user is unregistered, do not persist them.
+    estimate: 0
+    title: Persist users
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      Allow users to transmit full UTF-8 text messages.
+      
+      (this story shouldn't require any new code, just tests)
+    estimate: 0
+    title: UTF8
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      Daemonize, unless -f or --foreground is passed.
+      
+      -f and --f maybe should implicitly set logging to verbose.
+    estimate: 0
+    title: Daemon
+  :selected: 6
