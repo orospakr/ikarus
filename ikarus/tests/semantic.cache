@@ -1,0 +1,15 @@
+;; Object tests/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "tests/"
+  :tables (list 
+   (semanticdb-table "test_irc.py"
+    :major-mode 'python-mode
+    :tags '(("twisted.trial" include nil (dependency-file none) [1 35]) ("twisted.internet" include nil (dependency-file none) [36 59]) ("twisted.internet.reactor" include nil (dependency-file none) [60 91]) ("ikarus.irc" include nil (dependency-file none) [93 110]) ("IRCTestCase" type (:superclasses ("unittest.TestCase") :members (("setUp" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [164 168]))) (reparse-symbol indented_block_body) [154 482]) ("testInstantiate" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [549 553]))) (reparse-symbol indented_block_body) [529 595]) ("testEcho" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [613 617]))) (reparse-symbol indented_block_body) [600 744]) ("openConnection" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [1063 1067]))) (reparse-symbol indented_block_body) [1044 1102])) :type "class") nil [112 1102]))
+    :file "test_irc.py"
+    :pointmax 1269
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0pre4"
+  :semanticdb-version "2.0pre4"
+  )

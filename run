@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# this script lets you run ikarus out of tree.
+
+PYTHONPATH=. ikarus/ikarusd.py
