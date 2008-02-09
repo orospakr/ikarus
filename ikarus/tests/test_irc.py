@@ -27,7 +27,6 @@ class IRCTestCase(unittest.TestCase):
     def testEcho(self):
         self.i.lineReceived("whee")
         #twisted.internet.reactor.iterate()
-        logging.debug(self.tr.value().split())
         self.assertEquals(self.tr.value(), "whee\r\n")
 
     def testAllEcho(self):
@@ -49,8 +48,8 @@ class IRCTestCase(unittest.TestCase):
 #        i.lineReceived("PING irc.awesome.ca.")
 
     def openConnection(self):
-        self.i.makeConnection()
+        pass
+        #self.i.makeConnection()
         # RECEIVE NOTICE AUTH :*** Looking up your hostname...
-        # andrew start here and figure out how to detect what the Protocol
-        # printed back out.
+
 
