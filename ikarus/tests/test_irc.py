@@ -8,6 +8,23 @@ import ikarus.irc
 import logging
 
 class IRCTestCase(unittest.TestCase):
+    '''
+    Tests the IRC class.  The IRC class represents the user<->server
+    protocol.'''
+
+    connection_registered = [
+        ":localhost. 001 orospakr :Welcome to the Ikarus IRC-powered Test Net",
+        ":localhost. 002 orospakr :Your host is localhost.",
+#        "NOTICE orospakr :*** Your host is localhost.[localhost./6667], running version dancer-ircd-1.0.36",
+        ":localhost. 003 orospakr :This server was cobbled together Thu Nov  9 03:18:35 UTC 2006",
+        ":localhost. 004 orospakr localhost. dancer-ircd-1.0.36 aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStuUvVwWxXyYzZ0123459*@ bcdefFhiIklmnoPqstv",
+        ":localhost. 005 orospakr MODES=4 CHANLIMIT=#:20 NICKLEN=16 USERLEN=10 HOSTLEN=63 TOPICLEN=450 KICKLEN=450 CHANNELLEN=30 KEYLEN=23 CHANTYPES=# PREFIX=(ov)@+ CASEMAPPING=ascii CAPAB IRCD=dancer :are available on this server"
+]
+
+    def getLastOutputtedLine(self):
+        #logging.debug(self.tr.value().split("\r\n"))
+        return self.tr.value().split("\r\n")[-2]
+
     def setUp(self):
 
         self.factory = ikarus.irc.IRCFactory()
@@ -24,32 +41,24 @@ class IRCTestCase(unittest.TestCase):
     def testInstantiate(self):
         self.failIfEqual(self.i, None)
 
-    def testEcho(self):
-        self.i.lineReceived("whee")
-        #twisted.internet.reactor.iterate()
-        self.assertEquals(self.tr.value(), "whee\r\n")
+    def testNickChange(self):
+        self.i.lineReceived("NICK orospakr")
+        self.failUnlessEqual(self.i.nick, "orospakr")
+        self.i.lineReceived("NICK smartyman")
+        self.failUnlessEqual(self.i.nick, "smartyman")
 
-    def testAllEcho(self):
-        self.i2 = self.factory.buildProtocol(('127.0.0.1', 6667))
-        self.tr2 = proto_helpers.StringTransport()
-        self.i2.makeConnection(self.tr2)
+    def testConnectionOpened(self):
+        self.i.lineReceived("NICK orospakr")
+        self.i.lineReceived("USER orospakr orospakr localhost :Andrew Clunis")
+        # check to see that the user is logged in
+        self.failUnlessEqual(self.i.logged_in, True)
 
-        self.i.lineReceived("omgwtfbbq")
-        self.assertEquals(self.tr2.value(), "omgwtfbbq\r\n")
+    def testConnectionNotOpenedWithOnlyNick(self):
+        self.i.lineReceived("NICK orospakr")
+        self.failIfEqual(self.i.logged_in, True)
 
-
-#     def testNickChange(self):
-#         i.lineReceived("NICK orospakr")
-#         self.failUnlessEqual(i.nick, "orospakr")
-#         i.lineReceived("NICK smartyman")
-#         self.failUnlessEqual(i.nick, "smartyman")
-
-#    def testPing(self):
-#        i.lineReceived("PING irc.awesome.ca.")
-
-    def openConnection(self):
-        pass
-        #self.i.makeConnection()
-        # RECEIVE NOTICE AUTH :*** Looking up your hostname...
+    def testConnectionNotOpenedWithOnlyUser(self):
+        self.i.lineReceived("USER orospakr orospakr localhost :Andrew Clunis")
+        self.failIfEqual(self.i.logged_in, True)
 
 
