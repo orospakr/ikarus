@@ -11,7 +11,6 @@ class IRC(twisted.protocols.basic.LineReceiver):
     def lineReceived(self, line):
         #self.nick = line.split()[1]
         #self.se(line)
-        self.sendLine(line)
         for user in self.factory.users:
             user.sendLine(line)
 

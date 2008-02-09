@@ -29,7 +29,7 @@ class IRCTestCase(unittest.TestCase):
         self.i.lineReceived("whee")
         #twisted.internet.reactor.iterate()
         logging.debug(self.tr.value().split())
-        self.assertEquals(self.tr.value().split()[1], "whee")
+        self.assertEquals(self.tr.value(), "whee\r\n")
 
     def testAllEcho(self):
         self.i2 = self.factory.buildProtocol(('127.0.0.1', 6667))
@@ -37,9 +37,8 @@ class IRCTestCase(unittest.TestCase):
         self.i2.makeConnection(self.tr2)
 
         self.i.lineReceived("omgwtfbbq")
-        # here, the string transport's buffer only contains the outgoing message
-        # because the incoming message wasn't typed in on this session.
         self.assertEquals(self.tr2.value(), "omgwtfbbq\r\n")
+
 
 #     def testNickChange(self):
 #         i.lineReceived("NICK orospakr")
