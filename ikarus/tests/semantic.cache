@@ -4,9 +4,18 @@
   :tables (list 
    (semanticdb-table "test_irc.py"
     :major-mode 'python-mode
-    :tags '(("twisted.trial" include nil (dependency-file none) [1 35]) ("twisted.internet" include nil (dependency-file none) [36 59]) ("twisted.internet.reactor" include nil (dependency-file none) [60 91]) ("ikarus.irc" include nil (dependency-file none) [93 110]) ("IRCTestCase" type (:superclasses ("unittest.TestCase") :members (("setUp" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [164 168]))) (reparse-symbol indented_block_body) [154 482]) ("testInstantiate" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [549 553]))) (reparse-symbol indented_block_body) [529 595]) ("testEcho" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [613 617]))) (reparse-symbol indented_block_body) [600 744]) ("openConnection" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [1063 1067]))) (reparse-symbol indented_block_body) [1044 1102])) :type "class") nil [112 1102]))
+    :tags '(("twisted.trial" include nil (dependency-file none) [1 35]) ("twisted.test" include nil (dependency-file none) [36 74]) ("twisted.internet" include nil (dependency-file none) [76 99]) ("twisted.internet.reactor" include nil (dependency-file none) [100 131]) ("ikarus.irc" include nil (dependency-file none) [133 150]) ("logging" include nil (dependency-file none) [151 165]) ("IRCTestCase" type (:superclasses ("unittest.TestCase") :members (("'''
+    Tests the IRC class.  The IRC class represents the user<->server
+    protocol.'''" code nil (reparse-symbol indented_block_body) [209 298]) ("connection_registered" variable nil (reparse-symbol indented_block_body) [304 1056]) ("getLastOutputtedLine" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [1087 1091]))) (reparse-symbol indented_block_body) [1062 1197]) ("setUp" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [1212 1216]))) (reparse-symbol indented_block_body) [1202 1553]) ("testInstantiate" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [1708 1712]))) (reparse-symbol indented_block_body) [1688 1754]) ("testSetNick" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [1775 1779]))) (reparse-symbol indented_block_body) [1759 1982]) ("testConnectionOpened" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [2310 2314]))) (reparse-symbol indented_block_body) [2285 2544]) ("testConnectionNotOpenedWithOnlyNick" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [2589 2593]))) (reparse-symbol indented_block_body) [2549 2690]) ("testConnectionNotOpenedWithOnlyUser" function (:arguments (("self" variable nil (reparse-symbol function_parameters) [2735 2739]))) (reparse-symbol indented_block_body) [2695 2870])) :type "class") nil [167 2870]))
     :file "test_irc.py"
-    :pointmax 1269
+    :pointmax 2872
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "__init__.py"
+    :major-mode 'python-mode
+    :tags '(("logging" include nil (dependency-file none) [1 15]) ("logging" code nil nil [17 57]))
+    :file "__init__.py"
+    :pointmax 58
     )
    )
   :file "semantic.cache"

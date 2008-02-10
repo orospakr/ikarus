@@ -28,14 +28,35 @@ Iteration 1:
     estimate: 0
     title: User login as per RFC 1549.
   - !ruby/object:Story 
-    completed: false
+    completed: true
     description: "Return\n\n\
       :localhost. 431  :No nickname given\n\n\
       as per the RFC."
     estimate: 0
     title: Return error for bad NICK
   - !ruby/object:Story 
-    completed: false
+    completed: true
+    description: |
+      print: NOTICE AUTH :*** Looking up your hostname...
+      Perform hostname lookup (with a deferred), and have callback print:
+      NOTICE AUTH :*** Found your hostname
+
+    estimate: 0
+    title: Hostname Lookup and Connect status messages
+  - !ruby/object:Story 
+    completed: true
+    description: "On successful login, print the below:\n\n\
+      :localhost. 001 $user :Welcome to $hostname.\n\
+      :localhost. 002 $user :Your host is $hostname running version Ikarus\n\
+      NOTICE orospakr :*** Your host is  $hostname running version Ikarus\n\n\n\
+      maybe this stuff later:\n\n\
+      :localhost. 003 orospakr :This server was cobbled together Thu Nov  9 03:18:35 UTC 2006\n\
+      :localhost. 004 orospakr localhost. dancer-ircd-1.0.36 aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStuUvVwWxXyYzZ0123459*@ bcdefFhiIklmnoPqstv\n\
+      :localhost. 005 orospakr MODES=4 CHANLIMIT=#:20 NICKLEN=16 USERLEN=10 HOSTLEN=63 TOPICLEN=450 KICKLEN=450 CHANNELLEN=30 KEYLEN=23 CHANTYPES=# PREFIX=(ov)@+ CASEMAPPING=ascii CAPAB IRCD=dancer :are available on this servert"
+    estimate: 0
+    title: Login Status Messages
+  - !ruby/object:Story 
+    completed: true
     description: "Return\n\n\
       :localhost. 461 * USER :Not enough parameters\n\n\
       as per RFC."
@@ -55,6 +76,11 @@ Iteration 1:
       :orospakr!~orospakr@localhost. PRIVMSG #mychannel :whee.\n\n"
     estimate: 0
     title: Channel message
+  - !ruby/object:Story 
+    completed: false
+    description: ""
+    estimate: 0
+    title: -p, --port argument sets port number.
   - !ruby/object:Story 
     completed: false
     description: "Reply to PING packets with the standard reply as per the RFC.\n\n\
@@ -97,4 +123,4 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 0
     title: Daemon
-  :selected: 2
+  :selected: 7
