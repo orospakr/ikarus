@@ -14,12 +14,8 @@ import ikarus.tests.test_irc
 
 class ChannelTestCase(unittest.TestCase):
     def setUp(self):
-        #self.factory = ikarus.irc.IRCFactory()
-        #self.irc = self.factory.buildProtocol(None)
-        #self.irc.nick = "orospakr"
         self.irc_factory = pmock.Mock() # mockery of ikarus.irc.IRCFactory
         self.irc_factory.users = []
-#        self.irc_factory.expects(pmock.return_value(None)).register_channel()
         self.c = ikarus.channel.Channel(self.irc_factory, "mychannel")
 
     def testInstantiation(self):
@@ -28,20 +24,36 @@ class ChannelTestCase(unittest.TestCase):
     def testFindUser(self):
         user = pmock.Mock()
         user.nick = "orospakr"
+        user.name = "orospakr"
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
         self.irc_factory.users.append(user)
         self.c.joinUser(user)
         found_user = self.c.findUser("orospakr")
         self.failIfEqual(user, None)
         self.failUnlessEqual(user.nick, "orospakr")
+        self.failUnlessEqual(user.name, "orospakr")
 
     def testFindUserNoUser(self):
         found_user = self.c.findUser("orospakr")
         self.failUnlessEqual(found_user, None)
 
+    def testJoinUser(self):
+        self.joining_user = pmock.Mock()
+        self.joining_user.nick = "somefella"
+        self.joining_user.name = "sfella"
+        self.joining_user.expects(pmock.once()).sendLine(pmock.eq(
+                ":somefella!~sfella@localhost. JOIN :#mychannel"))
+        self.irc_factory.users.append(self.joining_user)
+        self.c.joinUser(self.joining_user)
+        self.joining_user.verify()
+
     def testInformJoin(self):
         self.listening_user = pmock.Mock()
         self.listening_user.nick = "listening_guy"
         self.listening_user.name = "listening_guy"
+        self.listening_user.expects(pmock.once()).sendLine(pmock.eq(
+                ":listening_guy!~listening_guy@localhost. JOIN :#mychannel"))
         self.listening_user.expects(pmock.once()).sendLine(pmock.eq(
                 ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
         self.irc_factory.users.append(self.listening_user)
@@ -49,8 +61,9 @@ class ChannelTestCase(unittest.TestCase):
         self.user = pmock.Mock()
         self.user.nick = "orospakr"
         self.user.name = "orospakr"
+        self.user.expects(pmock.once()).sendLine(pmock.eq(
+                ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
         self.irc_factory.users.append(self.user)
-        self.user.expects(pmock.never()).sendLine(pmock.eq(""))
 
         self.c.joinUser(self.listening_user)
         self.c.joinUser(self.user)

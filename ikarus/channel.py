@@ -3,11 +3,12 @@ class Channel(object):
         self.ircfactory = ircfactory
 #        self.ircfactory.register_channel(self)
         self.users = []
+        self.name = name
 
     def joinUser(self, user):
+        self.users.append(user)
         for u in self.users:
             u.sendLine(":%s!~%s@localhost. JOIN :#mychannel" % (user.nick, user.name))
-        self.users.append(user)
 
     def findUser(self, nick):
         for user in self.users:
