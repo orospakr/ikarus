@@ -100,18 +100,25 @@ class IRCTestCase(unittest.TestCase):
         # and this!
         pass
 
+    def testNickInUse(self):
+        # this too...
+        pass
+
     def testJoinAnExistingChannel(self):
         pass
 
     def testTwoJoinAChannel(self):
         self.testLogIn()
         self.i2.lineReceived("NICK my_second_guy")
-        self.i2.lineReceived("USER my_second_guy localhost :Another Dude")
+        self.i2.lineReceived("USER msg localhost :Another Dude")
         self.i.lineReceived("JOIN #mychannel")
         self.i2.lineReceived("JOIN #mychannel")
         input = self.tr.value().split("\r\n")
+        # check to see that the first user sees the second one join the channel
+        self.failUnlessEqual(input[-2], ":my_second_guy!~msg@localhost. JOIN :#my_channel")
         # I should test the presence (and lack thereof) of channel logged in info here,
         # once it exists.
+        # obviously not done yet...
 
 #     def testGetChannelByName(self):
 #         channel = self.factory.getChannelByName("mychannel")
