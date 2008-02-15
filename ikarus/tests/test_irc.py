@@ -51,7 +51,7 @@ class IRCTestCase(unittest.TestCase):
 
     def testSetUser(self):
         self.i.lineReceived("USER orospakr orospakrshostname localhost :Andrew Clunis")
-        self.failUnlessEqual(self.i.user_name, "orospakr")
+        self.failUnlessEqual(self.i.name, "orospakr")
 
     def testConnectionOpened(self):
         self.i.lineReceived("NOTICE AUTH :*** Looking up your hostname...")
@@ -84,12 +84,24 @@ class IRCTestCase(unittest.TestCase):
         input = self.tr.value().split("\r\n")
         self.failUnlessEqual(input[-2], ":localhost. 461 * USER :Not enough parameters")
 
-    def testJoinAChannel(self):
+    def testJoinANewChannel(self):
         self.testLogIn()
-        self.i2.lineReceived("JOIN #my_channel")
+        self.i.lineReceived("JOIN #my_channel")
         # I should test the presence of channel logged in info here, once it exists
         # expect callback here.
+        input = self.tr.value().split("\r\n")
+        self.failUnlessEqual(input[-2], ":orospakr!~orospakr@localhost. JOIN :#my_channel")
 
+    def testMalformedChannelJoin(self):
+        # do this next!
+        pass
+
+    def testJoinBeforeLoginShouldFail(self):
+        # and this!
+        pass
+
+    def testJoinAnExistingChannel(self):
+        pass
 
     def testTwoJoinAChannel(self):
         self.testLogIn()

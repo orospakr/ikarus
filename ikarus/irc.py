@@ -2,6 +2,8 @@ import twisted.protocols.basic
 import twisted.internet.protocol
 import logging
 
+import ikarus.channel
+
 class IRC(twisted.protocols.basic.LineReceiver):
 
     def __init__(self):
@@ -9,7 +11,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
         #self.logged_in = True
         self.logged_in = False
         self.nick = None
-        self.user_name = None
+        self.name = None
         pass
 
     def lineReceived(self, line):
@@ -19,19 +21,23 @@ class IRC(twisted.protocols.basic.LineReceiver):
                 self.sendLine(":localhost. 431  :No nickname given")
                 return
             self.nick = items[1]
-            if self.user_name is not None:
+            if self.name is not None:
                 self.doLogin()
         elif items[0] == "USER":
             if len(items) < 5:
                 self.sendLine(":localhost. 461 * USER :Not enough parameters")
                 return
-            self.user_name = items[1]
+            self.name = items[1]
             if self.nick is not None:
                 self.doLogin()
         elif items[0] == "PRIVMSG":
             if len(items) < 4:
                 # wrong number of args, should be error?
                 return
+        elif items[0] == "JOIN":
+            channel = ikarus.channel.Channel(self.factory, items[1][1:])
+            self.factory.channels.append(channel)
+            channel.joinUser(self)
 
     def connectionMade(self):
         self.factory.register_user(self)
