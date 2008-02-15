@@ -42,8 +42,8 @@ class IRC(twisted.protocols.basic.LineReceiver):
     def doLogin(self):
         '''COME BACK HERE'''
         self.logged_in = True
-        self.sendLine(":localhost. 001 %s :Welcome to $hostname.")
-        self.sendLine(":localhost. 002 $user :Your host is $hostname running version Ikarus")
+        self.sendLine(":localhost. 001 %s :Welcome to $hostname." % self.nick)
+        self.sendLine(":localhost. 002 %s :Your host is $hostname running version Ikarus" % self.nick)
         self.sendLine("NOTICE orospakr :*** Your host is $hostname running version Ikarus")
 
 class IRCFactory(twisted.internet.protocol.Factory):

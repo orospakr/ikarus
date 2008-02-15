@@ -59,10 +59,10 @@ class IRCTestCase(unittest.TestCase):
 
     def testLogIn(self):
         self.i.lineReceived("NICK orospakr")
-        self.i.lineReceived("USER orospakr orospakr localhost :Andrew Clunis")
+        self.i.lineReceived("USER orospakr blahblah-pppoe.myisp.ca ircserver.awesome.org :Andrew Clunis")
         input = self.tr.value().split("\r\n")
-        self.failUnlessEqual(input[2], ":localhost. 001 %s :Welcome to $hostname.")
-        self.failUnlessEqual(input[3], ":localhost. 002 $user :Your host is $hostname running version Ikarus")
+        self.failUnlessEqual(input[2], ":localhost. 001 orospakr :Welcome to $hostname.")
+        self.failUnlessEqual(input[3], ":localhost. 002 orospakr :Your host is $hostname running version Ikarus")
         self.failUnlessEqual(input[4], "NOTICE orospakr :*** Your host is $hostname running version Ikarus")
         self.failUnlessEqual(self.i.logged_in, True)
 
@@ -89,6 +89,7 @@ class IRCTestCase(unittest.TestCase):
         self.i2.lineReceived("JOIN #my_channel")
         # I should test the presence of channel logged in info here, once it exists
         # expect callback here.
+
 
     def testTwoJoinAChannel(self):
         self.testLogIn()
