@@ -23,6 +23,14 @@ class IRCTestCase(unittest.TestCase):
         # from the string transport.
         return self.getOutputtedLines()[-2]
 
+    def getOutputtedLines2(self):
+        return self.tr2.value().split("\r\n")
+
+    def getLastOutputtedLine2(self):
+        # not sure why, but I always get a blank line at the end of the value
+        # from the string transport.
+        return self.getOutputtedLines2()[-2]
+
     def setUp(self):
 
         self.factory = ikarus.irc.IRCFactory()
@@ -80,11 +88,11 @@ class IRCTestCase(unittest.TestCase):
 
     def testMalformedSetUser(self):
         self.i.lineReceived("USER")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters.")
 
     def testMalformedSetUserAlmostLongEnough(self):
         self.i.lineReceived("USER whee whee whee")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters.")
 
     def testJoinANewChannel(self):
         self.testLogIn()
@@ -96,20 +104,25 @@ class IRCTestCase(unittest.TestCase):
     def testMalformedChannelJoin(self):
         self.testLogIn()
         self.i.lineReceived("JOIN")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * JOIN :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(),
+                             ":localhost. 461 * JOIN :Not enough parameters.")
 
     def testMalformedChannelPrivmsg(self):
         self.testJoinANewChannel()
         self.i.lineReceived("PRIVMSG #mychannel")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * PRIVMSG :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(),
+                             ":localhost. 461 * PRIVMSG :Not enough parameters.")
 
     def testJoinBeforeLoginShouldFail(self):
         self.i.lineReceived("JOIN #mychannel")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 451 JOIN :You have not registered")
+        self.failUnlessEqual(self.getLastOutputtedLine(),
+                             ":localhost. 451 JOIN :You have not registered.")
 
     def testNickInUse(self):
-        # this too...
-        pass
+        self.testLogIn()
+        self.i2.lineReceived("NICK orospakr")
+        self.failUnlessEqual(self.getLastOutputtedLine2(),
+                             ":localhost. 433 * orospakr :Nickname is already in use.")
 
     def testPart(self):
         # make sure that the user is removed from the channel and does not receive
@@ -117,10 +130,8 @@ class IRCTestCase(unittest.TestCase):
         pass
 
     def testQuit(self):
-        # make sure user is parted from all channels, as above.
-        pass
-
-    def testJoinAnExistingChannel(self):
+        # make sure user is parted from all channels, as above, and can reconnect
+        # without getting incorrect "nickname in use messages"
         pass
 
     def testTwoJoinAChannel(self):
