@@ -93,15 +93,33 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(input[-2], ":orospakr!~orospakr@localhost. JOIN :#my_channel")
 
     def testMalformedChannelJoin(self):
-        # do this next!
-        pass
+        self.testLogIn()
+        self.i.lineReceived("JOIN")
+        input = self.tr.value().split("\r\n")
+        self.failUnlessEqual(input[-2], ":localhost. 461 * JOIN :Not enough parameters")
+
+    def testMalformedChannelPrivmsg(self):
+        self.testJoinANewChannel()
+        self.i.lineReceived("PRIVMSG #mychannel")
+        input = self.tr.value().split("\r\n")
+        self.failUnlessEqual(input[-2], ":localhost. 461 * PRIVMSG :Not enough parameters")
 
     def testJoinBeforeLoginShouldFail(self):
-        # and this!
-        pass
+        self.i.lineReceived("JOIN #mychannel")
+        input = self.tr.value().split("\r\n")
+        self.failUnlessEqual(input[-2], ":localhost. 451 JOIN :You have not registered")
 
     def testNickInUse(self):
         # this too...
+        pass
+
+    def testPart(self):
+        # make sure that the user is removed from the channel and does not receive
+        # new messages.
+        pass
+
+    def testQuit(self):
+        # make sure user is parted from all channels, as above.
         pass
 
     def testJoinAnExistingChannel(self):
@@ -115,22 +133,24 @@ class IRCTestCase(unittest.TestCase):
         self.i2.lineReceived("JOIN #mychannel")
         input = self.tr.value().split("\r\n")
         # check to see that the first user sees the second one join the channel
+#        logging.debug(input)
         self.failUnlessEqual(input[-2], ":my_second_guy!~msg@localhost. JOIN :#mychannel")
         # I should test the presence (and lack thereof) of channel logged in info here,
         # once it exists.
         # obviously not done yet...
 
-#     def testGetChannelByName(self):
-#         channel = self.factory.getChannelByName("mychannel")
-#         self.failUnlessEqual(channel.name, "mychannel")
+    def testGetChannelByName(self):
+        self.testJoinANewChannel()
+        channel = self.factory.getChannelByName("my_channel")
+        self.failUnlessEqual(channel.name, "my_channel")
 
     def testGetChannelByNameDoesNotExist(self):
         channel = self.factory.getChannelByName("wheetotallynothere")
         self.failUnlessEqual(channel, None)
 
-#     def testOneSpeaksToAnotherOnOneChannel(self):
-#         self.testTwoJoinAChannel()
-#         input = self.tr.value().split("\r\n")
-#         input2 = self.tr2.value().split("\r\n")
-#         self.i.lineReceived("PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
-#         self.failUnlessEqual(input2[-2], ":orospakr!~orospakr@localhost. PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
+    def testOneSpeaksToAnotherOnOneChannel(self):
+        self.testTwoJoinAChannel()
+        self.i.lineReceived("PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
+        input = self.tr.value().split("\r\n")
+        input2 = self.tr2.value().split("\r\n")
+        self.failUnlessEqual(input2[-2], ":orospakr!~orospakr@localhost. PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")

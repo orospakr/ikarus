@@ -15,6 +15,7 @@ import ikarus.tests.test_irc
 class ChannelTestCase(unittest.TestCase):
     def setUp(self):
         self.irc_factory = pmock.Mock() # mockery of ikarus.irc.IRCFactory
+        self.irc_factory.expects(pmock.once()).method("registerChannel")
         self.irc_factory.users = []
         self.c = ikarus.channel.Channel(self.irc_factory, "mychannel")
 
@@ -24,6 +25,7 @@ class ChannelTestCase(unittest.TestCase):
     # I might adapt this test case to also test a hostname other
     # than localhost.
     def testJoinAndMessageChannelWithNameOtherThanMyChannel(self):
+        self.irc_factory.expects(pmock.once()).method("registerChannel")
         chan = ikarus.channel.Channel(self.irc_factory, "coolpeopleonly")
         user = pmock.Mock()
         user.name = "nobody"
@@ -113,6 +115,21 @@ class ChannelTestCase(unittest.TestCase):
         self.c.privMsg(self.listening_user, "Happy times.")
         self.listening_user.verify()
         self.user.verify()
+
+    def testMessageFromNonJoinedUser(self):
+        user = pmock.Mock()
+        user.nick = "someone"
+        user.name = "sone"
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":someone!~sone@localhost. JOIN :#mychannel"))
+        self.c.joinUser(user)
+        naughty_user = pmock.Mock()
+        naughty_user.nick = "naughtyguy"
+        naughty_user.name = "nguy"
+        # the following message should never arrive...
+        user.expects(pmock.never()).method("sendLine")
+        self.c.privMsg(naughty_user, "You shouldn't be able to see this.")
+
 
 
 

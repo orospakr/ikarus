@@ -1,7 +1,7 @@
 class Channel(object):
     def __init__(self, ircfactory, name):
         self.ircfactory = ircfactory
-#        self.ircfactory.register_channel(self)
+        self.ircfactory.registerChannel(self)
         self.users = []
         self.name = name
 
@@ -21,4 +21,5 @@ class Channel(object):
         for user in self.users:
             if user is speaker:
                 continue
-            user.sendLine(':%s!~%s@localhost. PRIVMSG #%s :%s' % (speaker.nick, speaker.name, self.name, msg))
+            if speaker in self.users:
+                user.sendLine(':%s!~%s@localhost. PRIVMSG #%s :%s' % (speaker.nick, speaker.name, self.name, msg))
