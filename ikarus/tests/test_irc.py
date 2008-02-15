@@ -15,9 +15,13 @@ class IRCTestCase(unittest.TestCase):
     This also contains more general integration tests, based on the general
     path of delegation from this object to the others.'''
 
+    def getOutputtedLines(self):
+        return self.tr.value().split("\r\n")
+
     def getLastOutputtedLine(self):
-        #logging.debug(self.tr.value().split("\r\n"))
-        return self.tr.value().split("\r\n")[-2]
+        # not sure why, but I always get a blank line at the end of the value
+        # from the string transport.
+        return self.getOutputtedLines()[-2]
 
     def setUp(self):
 
@@ -46,7 +50,7 @@ class IRCTestCase(unittest.TestCase):
 
     def testMalformedSetNick(self):
         self.i.lineReceived("NICK")
-        input = self.tr.value().split("\r\n")[-2] # argh, doing [-2] is bad!  why is a blank line arriving?
+        input = self.getLastOutputtedLine()
         self.failUnlessEqual(input, ":localhost. 431  :No nickname given")
 
     def testSetUser(self):
@@ -60,7 +64,7 @@ class IRCTestCase(unittest.TestCase):
     def testLogIn(self):
         self.i.lineReceived("NICK orospakr")
         self.i.lineReceived("USER orospakr blahblah-pppoe.myisp.ca ircserver.awesome.org :Andrew Clunis")
-        input = self.tr.value().split("\r\n")
+        input = self.getOutputtedLines()
         self.failUnlessEqual(input[2], ":localhost. 001 orospakr :Welcome to $hostname.")
         self.failUnlessEqual(input[3], ":localhost. 002 orospakr :Your host is $hostname running version Ikarus")
         self.failUnlessEqual(input[4], "NOTICE orospakr :*** Your host is $hostname running version Ikarus")
@@ -76,38 +80,32 @@ class IRCTestCase(unittest.TestCase):
 
     def testMalformedSetUser(self):
         self.i.lineReceived("USER")
-        input = self.tr.value().split("\r\n")
-        self.failUnlessEqual(input[-2], ":localhost. 461 * USER :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters")
 
     def testMalformedSetUserAlmostLongEnough(self):
         self.i.lineReceived("USER whee whee whee")
-        input = self.tr.value().split("\r\n")
-        self.failUnlessEqual(input[-2], ":localhost. 461 * USER :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters")
 
     def testJoinANewChannel(self):
         self.testLogIn()
         self.i.lineReceived("JOIN #my_channel")
         # I should test the presence of channel logged in info here, once it exists
         # expect callback here.
-        input = self.tr.value().split("\r\n")
-        self.failUnlessEqual(input[-2], ":orospakr!~orospakr@localhost. JOIN :#my_channel")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":orospakr!~orospakr@localhost. JOIN :#my_channel")
 
     def testMalformedChannelJoin(self):
         self.testLogIn()
         self.i.lineReceived("JOIN")
-        input = self.tr.value().split("\r\n")
-        self.failUnlessEqual(input[-2], ":localhost. 461 * JOIN :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * JOIN :Not enough parameters")
 
     def testMalformedChannelPrivmsg(self):
         self.testJoinANewChannel()
         self.i.lineReceived("PRIVMSG #mychannel")
-        input = self.tr.value().split("\r\n")
-        self.failUnlessEqual(input[-2], ":localhost. 461 * PRIVMSG :Not enough parameters")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * PRIVMSG :Not enough parameters")
 
     def testJoinBeforeLoginShouldFail(self):
         self.i.lineReceived("JOIN #mychannel")
-        input = self.tr.value().split("\r\n")
-        self.failUnlessEqual(input[-2], ":localhost. 451 JOIN :You have not registered")
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 451 JOIN :You have not registered")
 
     def testNickInUse(self):
         # this too...
@@ -131,13 +129,7 @@ class IRCTestCase(unittest.TestCase):
         self.i2.lineReceived("USER msg localhost :Another Dude")
         self.i.lineReceived("JOIN #mychannel")
         self.i2.lineReceived("JOIN #mychannel")
-        input = self.tr.value().split("\r\n")
-        # check to see that the first user sees the second one join the channel
-#        logging.debug(input)
-        self.failUnlessEqual(input[-2], ":my_second_guy!~msg@localhost. JOIN :#mychannel")
-        # I should test the presence (and lack thereof) of channel logged in info here,
-        # once it exists.
-        # obviously not done yet...
+        self.failUnlessEqual(self.getLastOutputtedLine(), ":my_second_guy!~msg@localhost. JOIN :#mychannel")
 
     def testGetChannelByName(self):
         self.testJoinANewChannel()
@@ -151,6 +143,5 @@ class IRCTestCase(unittest.TestCase):
     def testOneSpeaksToAnotherOnOneChannel(self):
         self.testTwoJoinAChannel()
         self.i.lineReceived("PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
-        input = self.tr.value().split("\r\n")
         input2 = self.tr2.value().split("\r\n")
         self.failUnlessEqual(input2[-2], ":orospakr!~orospakr@localhost. PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
