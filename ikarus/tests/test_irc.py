@@ -115,7 +115,7 @@ class IRCTestCase(unittest.TestCase):
         self.i2.lineReceived("JOIN #mychannel")
         input = self.tr.value().split("\r\n")
         # check to see that the first user sees the second one join the channel
-        self.failUnlessEqual(input[-2], ":my_second_guy!~msg@localhost. JOIN :#my_channel")
+        self.failUnlessEqual(input[-2], ":my_second_guy!~msg@localhost. JOIN :#mychannel")
         # I should test the presence (and lack thereof) of channel logged in info here,
         # once it exists.
         # obviously not done yet...
