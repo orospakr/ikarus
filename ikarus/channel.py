@@ -8,7 +8,7 @@ class Channel(object):
     def joinUser(self, user):
         self.users.append(user)
         for u in self.users:
-            u.sendLine(":%s!~%s@localhost. JOIN :#mychannel" % (user.nick, user.name))
+            u.sendLine(":%s!~%s@localhost. JOIN :#%s" % (user.nick, user.name, self.name))
 
     def findUser(self, nick):
         for user in self.users:
@@ -21,4 +21,4 @@ class Channel(object):
         for user in self.users:
             if user is speaker:
                 continue
-            user.sendLine(':%s!~%s@localhost. PRIVMSG #mychannel :%s' % (speaker.nick, speaker.name, msg))
+            user.sendLine(':%s!~%s@localhost. PRIVMSG #%s :%s' % (speaker.nick, speaker.name, self.name, msg))

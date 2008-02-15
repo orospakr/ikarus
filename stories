@@ -74,7 +74,7 @@ Iteration 1:
     description: "Interpret PRIVMSG, and transmit the text to the other users in the channel provided by the first argument.\n\n\
       Speaker sends:\n\n\
       PRIVMSG #mychannel :whee.\n\n\
-      All other users see (but not the original sender):\n\n\
+      All other users see (but not the original sender, IRC being asynchronous and all):\n\n\
       :orospakr!~orospakr@localhost. PRIVMSG #mychannel :whee.\n\n"
     estimate: 0
     title: Channel message
@@ -125,4 +125,4 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 0
     title: Daemon
-  :selected: 7
+  :selected: 4

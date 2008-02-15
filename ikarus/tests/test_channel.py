@@ -21,6 +21,32 @@ class ChannelTestCase(unittest.TestCase):
     def testInstantiation(self):
         self.failIfEqual(self.c, None)
 
+    # I might adapt this test case to also test a hostname other
+    # than localhost.
+    def testJoinAndMessageChannelWithNameOtherThanMyChannel(self):
+        chan = ikarus.channel.Channel(self.irc_factory, "coolpeopleonly")
+        user = pmock.Mock()
+        user.name = "nobody"
+        user.nick = "clevernickname"
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":clevernickname!~nobody@localhost. JOIN :#coolpeopleonly"))
+        self.irc_factory.users.append(user)
+        chan.joinUser(user)
+
+        other_user = pmock.Mock()
+        other_user.name = "someone_else"
+        other_user.nick = "spam_and_eggs"
+        other_user.expects(pmock.once()).sendLine(pmock.eq(
+                ":spam_and_eggs!~someone_else@localhost. JOIN :#coolpeopleonly"))
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":spam_and_eggs!~someone_else@localhost. JOIN :#coolpeopleonly"))
+        self.irc_factory.users.append(other_user)
+        chan.joinUser(other_user)
+
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":spam_and_eggs!~someone_else@localhost. PRIVMSG #coolpeopleonly :Hi There!"))
+        chan.privMsg(other_user, "Hi There!")
+
     def testFindUser(self):
         user = pmock.Mock()
         user.nick = "orospakr"
