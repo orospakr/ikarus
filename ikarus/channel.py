@@ -1,9 +1,9 @@
 class Channel(object):
     def __init__(self, ircfactory, name):
         self.ircfactory = ircfactory
-        self.ircfactory.registerChannel(self)
         self.users = []
         self.name = name
+        self.ircfactory.registerChannel(self)
 
     def joinUser(self, user):
         self.users.append(user)
@@ -23,3 +23,8 @@ class Channel(object):
                 continue
             if speaker in self.users:
                 user.sendLine(':%s!~%s@localhost. PRIVMSG #%s :%s' % (speaker.nick, speaker.name, self.name, msg))
+
+    def partUser(self, leaver, msg):
+        for user in self.users:
+            user.sendLine(':%s!~%s@localhost. PART #%s :%s' % (leaver.nick, leaver.name, self.name, msg))
+        self.users.remove(leaver)

@@ -130,6 +130,20 @@ class ChannelTestCase(unittest.TestCase):
         user.expects(pmock.never()).method("sendLine")
         self.c.privMsg(naughty_user, "You shouldn't be able to see this.")
 
+    def testPartUser(self):
+        user = pmock.Mock()
+        user.nick = "someone"
+        user.name = "sone"
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":someone!~sone@localhost. JOIN :#mychannel"))
+        self.c.joinUser(user)
+
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":someone!~sone@localhost. PART #mychannel :Toodles!"))
+        self.c.partUser(user, "Toodles!")
+
+
+
 
 
 

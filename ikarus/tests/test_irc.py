@@ -118,7 +118,7 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(self.getLastOutputtedLine(),
                              ":localhost. 451 JOIN :You have not registered.")
 
-    def testNickInUse(self):
+    def testNickInUseAlreadyLoggedIn(self):
         self.testLogIn()
         self.i2.lineReceived("NICK orospakr")
         self.failUnlessEqual(self.getLastOutputtedLine2(),
@@ -127,12 +127,56 @@ class IRCTestCase(unittest.TestCase):
     def testPart(self):
         # make sure that the user is removed from the channel and does not receive
         # new messages.
-        pass
+        self.testTwoJoinAChannel()
+        self.i.lineReceived("PART #mychannel :Bye bye.")
+        self.failUnlessEqual(self.getLastOutputtedLine(),
+                             ":orospakr!~orospakr@localhost. PART #mychannel :Bye bye.")
+        self.failUnlessEqual(self.getLastOutputtedLine2(),
+                             ":orospakr!~orospakr@localhost. PART #mychannel :Bye bye.")
+        self.i.lineReceived("PRIVMSG #mychannel :Lorem Ipsum...")
+        self.failIfEqual(self.getLastOutputtedLine2(),
+                         ":orospakr!~orospakr@localhost. PRIVMSG #mychannel :Lorem Ipsum...")
 
-    def testQuit(self):
-        # make sure user is parted from all channels, as above, and can reconnect
-        # without getting incorrect "nickname in use messages"
-        pass
+    def testMalformedPart(self):
+        self.testTwoJoinAChannel()
+        self.i.lineReceived("PART")
+        self.failUnlessEqual(self.getLastOutputtedLine(),
+                             ":localhost. 461 orospakr PART :Not enough parameters.")
+
+    def testPartFromThreeChannels(self):
+        # this only tests the reception of the part message.  We assume that
+        # if we got that, the test above tested the rest of the removal logic
+        # sufficiently.
+        self.testLogIn()
+        self.i.lineReceived("JOIN #firstchannel")
+        logging.debug("MYCHANNEL SHOULD BE REG'D NEXT")
+        self.i.lineReceived("JOIN #mychannel")
+        self.i.lineReceived("JOIN #another_channel")
+        logging.debug("NOW ABOUT TO PART")
+        self.i.lineReceived("PART #firstchannel,#mychannel,#another_channel :I'm outta here!")
+        lines = self.getOutputtedLines()
+        self.failUnlessEqual(lines[-3],
+                             ":orospakr!~orospakr@localhost. PART #mychannel :I'm outta here!")
+        self.failUnlessEqual(lines[-2],
+                             ":orospakr!~orospakr@localhost. PART #another_channel :I'm outta here!")
+
+#     def testPartMalformedMessageMissingColon(self):
+#         pass
+
+#     def testPartFromNonExistentChannel(self):
+#         # this should be tested in this testcase.
+#         pass
+
+#     def testPartFromNonJoinedChannel(self):
+# #        :localhost. 442 orospakr #wheeeee :You're not on that channel
+#         # this should perhaps be just tested in ChannelTest, not here (because
+#         # the decision being tested is there, not here)
+#         pass
+
+#     def testQuit(self):
+#         # make sure user is parted from all channels, as above, and can reconnect
+#         # without getting incorrect "nickname in use messages"
+#         pass
 
     def testTwoJoinAChannel(self):
         self.testLogIn()

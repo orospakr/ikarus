@@ -59,8 +59,22 @@ class IRC(twisted.protocols.basic.LineReceiver):
             if channel is None:
 #                logging.debug("Channel %s does not exist, so creating a new one, for %s!" % (channel_name, self.nick))
                 channel = ikarus.channel.Channel(self.factory, channel_name)
-                self.factory.channels.append(channel)
             channel.joinUser(self)
+
+        elif items[0] == "PART":
+            if len(items) < 2:
+                self.sendLine(":localhost. 461 %s PART :Not enough parameters." % self.nick)
+                return
+            channel_args = items[1]
+            logging.debug("channel args was '%s'" % channel_args)
+            channel_names = channel_args.split(",")
+            message_start = len("PART ") + len(channel_args) + 2 # HACK why is this 2, rather than the 3 used in the PRIVMSG block?!??!
+            message = line[message_start:]
+            logging.debug("Part message was: %s" % message)
+            for channel_name in channel_names:
+                logging.debug(channel_name[1:])
+                channel = self.factory.getChannelByName(channel_name[1:])
+                channel.partUser(self, message)
 
     def connectionMade(self):
         self.factory.registerUser(self)
@@ -86,6 +100,7 @@ class IRCFactory(twisted.internet.protocol.Factory):
         self.users.append(user)
 
     def registerChannel(self, channel):
+        logging.debug("Channel registered: %s" % channel.name)
         self.channels.append(channel)
 
     def getUserByNick(self, nick):
@@ -99,5 +114,4 @@ class IRCFactory(twisted.internet.protocol.Factory):
         for c in self.channels:
             if c.name == name:
                 return c
-            else:
-                return None
+        return None
