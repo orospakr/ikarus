@@ -7,6 +7,7 @@ class Channel(object):
 
     def joinUser(self, user):
         self.users.append(user)
+        user.joined_channels.append(self)
         for u in self.users:
             u.sendLine(":%s!~%s@localhost. JOIN :#%s" % (user.nick, user.name, self.name))
 
@@ -25,6 +26,15 @@ class Channel(object):
                 user.sendLine(':%s!~%s@localhost. PRIVMSG #%s :%s' % (speaker.nick, speaker.name, self.name, msg))
 
     def partUser(self, leaver, msg):
+        if leaver not in self.users:
+            leaver.sendLine(":localhost. 422 %s #%s :You're not on that channel." % (
+                    leaver.nick, self.name))
+            return
         for user in self.users:
             user.sendLine(':%s!~%s@localhost. PART #%s :%s' % (leaver.nick, leaver.name, self.name, msg))
         self.users.remove(leaver)
+
+    def quitUser(self, quitter, msg):
+        for user in self.users:
+            user.sendLine(':%s!~%s@localhost. QUIT :%s' % (quitter.nick, quitter.name, msg))
+        self.users.remove(quitter)

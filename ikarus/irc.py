@@ -12,6 +12,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
         self.logged_in = False
         self.nick = None
         self.name = None
+        self.joined_channels = []
 
     def lineReceived(self, line):
         items = line.split(" ")
@@ -66,15 +67,21 @@ class IRC(twisted.protocols.basic.LineReceiver):
                 self.sendLine(":localhost. 461 %s PART :Not enough parameters." % self.nick)
                 return
             channel_args = items[1]
-            logging.debug("channel args was '%s'" % channel_args)
             channel_names = channel_args.split(",")
             message_start = len("PART ") + len(channel_args) + 2 # HACK why is this 2, rather than the 3 used in the PRIVMSG block?!??!
             message = line[message_start:]
-            logging.debug("Part message was: %s" % message)
             for channel_name in channel_names:
-                logging.debug(channel_name[1:])
                 channel = self.factory.getChannelByName(channel_name[1:])
-                channel.partUser(self, message)
+                if channel is None:
+                    self.sendLine(":localhost. 403 orospakr #doesnotexist :That channel doesn't exist.")
+                else:
+                    channel.partUser(self, message)
+
+        elif items[0] == "QUIT":
+            message_start = len("QUIT ") + 1 # +1 to skip the colon
+            message = line[message_start:]
+            for chan in self.joined_channels:
+                chan.quitUser(self, message)
 
     def connectionMade(self):
         self.factory.registerUser(self)
@@ -100,7 +107,6 @@ class IRCFactory(twisted.internet.protocol.Factory):
         self.users.append(user)
 
     def registerChannel(self, channel):
-        logging.debug("Channel registered: %s" % channel.name)
         self.channels.append(channel)
 
     def getUserByNick(self, nick):

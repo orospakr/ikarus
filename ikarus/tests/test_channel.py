@@ -30,6 +30,7 @@ class ChannelTestCase(unittest.TestCase):
         user = pmock.Mock()
         user.name = "nobody"
         user.nick = "clevernickname"
+        user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":clevernickname!~nobody@localhost. JOIN :#coolpeopleonly"))
         self.irc_factory.users.append(user)
@@ -38,6 +39,7 @@ class ChannelTestCase(unittest.TestCase):
         other_user = pmock.Mock()
         other_user.name = "someone_else"
         other_user.nick = "spam_and_eggs"
+        other_user.joined_channels = []
         other_user.expects(pmock.once()).sendLine(pmock.eq(
                 ":spam_and_eggs!~someone_else@localhost. JOIN :#coolpeopleonly"))
         user.expects(pmock.once()).sendLine(pmock.eq(
@@ -53,6 +55,7 @@ class ChannelTestCase(unittest.TestCase):
         user = pmock.Mock()
         user.nick = "orospakr"
         user.name = "orospakr"
+        user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
         self.irc_factory.users.append(user)
@@ -70,6 +73,7 @@ class ChannelTestCase(unittest.TestCase):
         self.joining_user = pmock.Mock()
         self.joining_user.nick = "somefella"
         self.joining_user.name = "sfella"
+        self.joining_user.joined_channels = []
         self.joining_user.expects(pmock.once()).sendLine(pmock.eq(
                 ":somefella!~sfella@localhost. JOIN :#mychannel"))
         self.irc_factory.users.append(self.joining_user)
@@ -80,6 +84,7 @@ class ChannelTestCase(unittest.TestCase):
         self.listening_user = pmock.Mock()
         self.listening_user.nick = "listening_guy"
         self.listening_user.name = "listening_guy"
+        self.listening_user.joined_channels = []
         self.listening_user.expects(pmock.once()).sendLine(pmock.eq(
                 ":listening_guy!~listening_guy@localhost. JOIN :#mychannel"))
         self.listening_user.expects(pmock.once()).sendLine(pmock.eq(
@@ -89,6 +94,7 @@ class ChannelTestCase(unittest.TestCase):
         self.user = pmock.Mock()
         self.user.nick = "orospakr"
         self.user.name = "orospakr"
+        self.user.joined_channels = []
         self.user.expects(pmock.once()).sendLine(pmock.eq(
                 ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
         self.irc_factory.users.append(self.user)
@@ -120,6 +126,7 @@ class ChannelTestCase(unittest.TestCase):
         user = pmock.Mock()
         user.nick = "someone"
         user.name = "sone"
+        user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":someone!~sone@localhost. JOIN :#mychannel"))
         self.c.joinUser(user)
@@ -134,6 +141,7 @@ class ChannelTestCase(unittest.TestCase):
         user = pmock.Mock()
         user.nick = "someone"
         user.name = "sone"
+        user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":someone!~sone@localhost. JOIN :#mychannel"))
         self.c.joinUser(user)
@@ -142,7 +150,17 @@ class ChannelTestCase(unittest.TestCase):
                 ":someone!~sone@localhost. PART #mychannel :Toodles!"))
         self.c.partUser(user, "Toodles!")
 
+    def testPartUserThatHasNotJoinedThisChannel(self):
+        #        :localhost. 442 orospakr #wheeeee :You're not on that channel
+        # this should perhaps be just tested in ChannelTest, not here (because
+        # the decision being tested is there, not here)
 
+        user = pmock.Mock()
+        user.nick = "unjoined_person"
+        user.name = "ujp"
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 422 unjoined_person #mychannel :You're not on that channel."))
+        self.c.partUser(user, "Bye.")
 
 
 

@@ -149,10 +149,8 @@ class IRCTestCase(unittest.TestCase):
         # sufficiently.
         self.testLogIn()
         self.i.lineReceived("JOIN #firstchannel")
-        logging.debug("MYCHANNEL SHOULD BE REG'D NEXT")
         self.i.lineReceived("JOIN #mychannel")
         self.i.lineReceived("JOIN #another_channel")
-        logging.debug("NOW ABOUT TO PART")
         self.i.lineReceived("PART #firstchannel,#mychannel,#another_channel :I'm outta here!")
         lines = self.getOutputtedLines()
         self.failUnlessEqual(lines[-3],
@@ -160,23 +158,51 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(lines[-2],
                              ":orospakr!~orospakr@localhost. PART #another_channel :I'm outta here!")
 
+#     actually, I'm not going to bother with this.  The RFC says the colon
+#     must always be there, so why bother making it flexible just because dancer is?
 #     def testPartMalformedMessageMissingColon(self):
-#         pass
+#         self.testLogIn()
+#         self.i.lineReceived("JOIN #mychannel")
+#         self.i.lineReceived("PART #mychannel no colon, but it should still work!")
+#         self.failUnlessEqual(self.getLastOutputtedLine(),
+#                              ":orospakr!~orospakr@localhost. PART #mychannel :no colon, but it should still work!")
 
-#     def testPartFromNonExistentChannel(self):
-#         # this should be tested in this testcase.
-#         pass
+    def testPartFromNonExistentChannel(self):
+        # this should be tested in this testcase.
+        self.testLogIn()
+        self.i.lineReceived("PART #doesnotexist")
+        self.failUnlessEqual(self.getLastOutputtedLine(),
+                             ":localhost. 403 orospakr #doesnotexist :That channel doesn't exist.")
 
-#     def testPartFromNonJoinedChannel(self):
-# #        :localhost. 442 orospakr #wheeeee :You're not on that channel
-#         # this should perhaps be just tested in ChannelTest, not here (because
-#         # the decision being tested is there, not here)
-#         pass
+    def testQuit(self):
+        # make sure user is parted from all channels, as above, and can reconnect
+        # without getting incorrect "nickname in use messages"
+        self.testTwoJoinAChannel()
+        self.i2.lineReceived("QUIT :bye bye!")
+        self.failUnlessEqual(self.getLastOutputtedLine2(),
+                             ":my_second_guy!~msg@localhost. QUIT :bye bye!")
 
-#     def testQuit(self):
-#         # make sure user is parted from all channels, as above, and can reconnect
-#         # without getting incorrect "nickname in use messages"
-#         pass
+    def testQuitDoesNotSendMultipleQuitMessagesToEachUser(self):
+        # andrew, come back here!
+        # right now there is a silly bug, where, because transmitting the QUIT message
+        # is delegated to all the channels that the user is joined to,
+        # any user that is in more than one channel with the quitting user
+        # will get multiple quits. oops!
+        pass
+
+    def testConnectionLost(self):
+        pass
+
+    def testChanneListIsUpdatedOnJoin(self):
+        def channelToName(c):
+            return c.name
+        self.testLogIn()
+        chans = ["mychannel", "somechannel", "anotherplace"]
+        for c in chans:
+            self.i.lineReceived("JOIN #%s" % c)
+        joined_channel_names = map(channelToName, self.i.joined_channels)
+        for c in chans:
+            self.failUnlessEqual(True, c in joined_channel_names)
 
     def testTwoJoinAChannel(self):
         self.testLogIn()
@@ -200,3 +226,13 @@ class IRCTestCase(unittest.TestCase):
         self.i.lineReceived("PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
         input2 = self.tr2.value().split("\r\n")
         self.failUnlessEqual(input2[-2], ":orospakr!~orospakr@localhost. PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
+
+    def testChannelPartUnjoinedUser(self):
+        self.testLogIn()
+        self.i2.lineReceived("NICK my_second_guy")
+        self.i2.lineReceived("USER msg localhost :Someone else.")
+        self.i2.lineReceived("JOIN #channel")
+        self.i.lineReceived("PART #channel")
+        self.failUnlessEqual(self.getLastOutputtedLine(),
+                             ":localhost. 422 orospakr #channel :You're not on that channel.")
+
