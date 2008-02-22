@@ -178,8 +178,10 @@ class IRCTestCase(unittest.TestCase):
         # without getting incorrect "nickname in use messages"
         self.testTwoJoinAChannel()
         self.i2.lineReceived("QUIT :bye bye!")
-        self.failUnlessEqual(self.getLastOutputtedLine2(),
+        self.failUnlessEqual(self.getLastOutputtedLine(),
                              ":my_second_guy!~msg@localhost. QUIT :bye bye!")
+        self.failUnlessEqual(self.getLastOutputtedLine2(),
+                             "ERROR :Closing Link: my_second_guy (Client Quit)")
 
     def testQuitDoesNotSendMultipleQuitMessagesToEachUser(self):
         # right now there is a silly bug, where, because transmitting the QUIT message
