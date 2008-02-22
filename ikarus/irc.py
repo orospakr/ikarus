@@ -80,8 +80,15 @@ class IRC(twisted.protocols.basic.LineReceiver):
         elif items[0] == "QUIT":
             message_start = len("QUIT ") + 1 # +1 to skip the colon
             message = line[message_start:]
+
+            all_users_who_care = set([])
             for chan in self.joined_channels:
-                chan.quitUser(self, message)
+                all_users_who_care = all_users_who_care.union(
+                    chan.users)
+            for u in all_users_who_care:
+                u.sendLine(':%s!~%s@localhost. QUIT :%s' % (self.nick, self.name, message))
+#             for chan in self.joined_channels:
+#                 chan.quitUser(self, message)
 
     def connectionMade(self):
         self.factory.registerUser(self)

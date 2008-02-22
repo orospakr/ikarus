@@ -63,13 +63,13 @@ Iteration 1:
     estimate: 0
     title: Return error for bad USER
   - !ruby/object:Story 
-    completed: false
+    completed: true
     description: "Interpret JOIN and PART messages (RFC 1459), associate the user to a channel.\n\n\
       All users in channel receive:\n\
       :orospakr!~orospakr@localhost. JOIN :#mychannel\n\n\n\
       For parting, receive a message in the form:\n\
       PART #my_channel,#another_channel Bye bye, I'm out.\n\n\
-      Other users "
+      Quitting transmits your QUIT message to all the users in the channels you are joined to."
     estimate: 0
     title: Join and part channels, as RFC 1549
   - !ruby/object:Story 

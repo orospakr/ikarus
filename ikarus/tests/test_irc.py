@@ -32,7 +32,6 @@ class IRCTestCase(unittest.TestCase):
         return self.getOutputtedLines2()[-2]
 
     def setUp(self):
-
         self.factory = ikarus.irc.IRCFactory()
         self.i = self.factory.buildProtocol(('127.0.0.1', 6667))
         self.i2 = self.factory.buildProtocol(('127.0.0.1', 6667))
@@ -183,12 +182,28 @@ class IRCTestCase(unittest.TestCase):
                              ":my_second_guy!~msg@localhost. QUIT :bye bye!")
 
     def testQuitDoesNotSendMultipleQuitMessagesToEachUser(self):
-        # andrew, come back here!
         # right now there is a silly bug, where, because transmitting the QUIT message
         # is delegated to all the channels that the user is joined to,
         # any user that is in more than one channel with the quitting user
         # will get multiple quits. oops!
-        pass
+        self.testLogIn()
+        self.i2.lineReceived("NICK secondguy")
+        self.i2.lineReceived("USER sguy secondguy.myisp.ca localhost. :Someone.")
+        self.i.lineReceived("JOIN #somewhere")
+        self.i2.lineReceived("JOIN #somewhere")
+        self.i.lineReceived("JOIN #somewhere_else")
+        self.i2.lineReceived("JOIN #somewhere_else")
+        self.i2.lineReceived("QUIT :hasta la vista!")
+
+        lines = self.getOutputtedLines()
+
+        # check to see if the first user got an extra QUIT line back.
+        first_returned_statement = lines[-3].split(" ")[1]
+        second_returned_statement = lines[-2].split(" ")[1]
+        logging.debug(first_returned_statement)
+        self.failIfEqual(first_returned_statement, "QUIT")
+        # make sure the single message does arrive.
+        self.failUnlessEqual(second_returned_statement, "QUIT")
 
     def testConnectionLost(self):
         pass
