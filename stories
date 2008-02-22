@@ -65,15 +65,28 @@ Iteration 1:
   - !ruby/object:Story 
     completed: true
     description: "Interpret JOIN and PART messages (RFC 1459), associate the user to a channel.\n\n\
-      All users in channel receive:\n\
-      :orospakr!~orospakr@localhost. JOIN :#mychannel\n\n\n\
-      For parting, receive a message in the form:\n\
-      PART #my_channel,#another_channel Bye bye, I'm out.\n\n\
-      Quitting transmits your QUIT message to all the users in the channels you are joined to."
+      When the user JOINs:\n\
+      JOIN #mychannel\n\
+      All users the channel receive (including the joined user herself):\n\
+      :orospakr!~orospakr@localhost. JOIN :#mychannel\n\n\
+      When the user PARTs:\n\
+      PART #mychannel :I'm outta here!\n\
+      All users in the channel receive (including the formerly joined user herself):\n\
+      :orospakr!~orospakr@localhost. PART #another_channel :I'm outta here!\n\n"
     estimate: 0
     title: Join and part channels, as RFC 1549
   - !ruby/object:Story 
-    completed: false
+    completed: true
+    description: "When the user QUITs:\n\
+      QUIT :Bye bye!\n\n\
+      All users in all the channels the user is joined to receive:\n\
+      :orospakr!~orospakr@localhost. QUIT :Bye bye!\n\n\
+      The user herself receives:\n\
+      ERROR :Closing Link: my_second_guy (Client Quit)"
+    estimate: 0
+    title: Quitting by means of QUIT verb
+  - !ruby/object:Story 
+    completed: true
     description: "Interpret PRIVMSG, and transmit the text to the other users in the channel provided by the first argument.\n\n\
       Speaker sends:\n\n\
       PRIVMSG #mychannel :whee.\n\n\
@@ -128,4 +141,4 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 0
     title: Daemon
-  :selected: 7
+  :selected: 10
