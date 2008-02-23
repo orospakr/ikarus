@@ -6,6 +6,11 @@ iterations:
     name: Iteration 1
     start: Feb 02, 08
     velocity: 0.818181818181818
+  - !ruby/object:Iteration 
+    end: ""
+    name: Iteration 2
+    start: ""
+    velocity: 0.0
   :selected: 0
 Iteration 1: 
   :list: 
@@ -139,4 +144,30 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 1
     title: Daemon
-  :selected: 10
+  :selected: 14
+Iteration 2: 
+  :selected: 1
+  :list: 
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      Support the KLINE command as a means to place persistent server-wide bans that prevent logins based on the following filter format:
+      
+      <user>@<hostname>
+      
+      asterisks may be used as variable-length wildcards.
+    estimate: 1
+    title: kline
+  - !ruby/object:Story 
+    completed: false
+    description: ""
+    estimate: 2
+    title: CTCP message support
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      Any user sending too many CTCP messages will be removed.
+      
+      Any user receiving too many CTCP messages will cause those messages to be dropped and logged, to prevent more distributed flood attacks.
+    estimate: 1
+    title: CTCP flood protection
