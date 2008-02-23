@@ -47,6 +47,10 @@ class IRCTestCase(unittest.TestCase):
     def setNick(self, u, nickname):
         u.lineReceived("NICK %s" % nickname)
 
+    def setUser(self, u, username, hostname, servername, realname):
+        u.lineReceived("USER %s %s %s :%s" % (username, hostname,
+                                              servername, realname))
+
     def testSetNick(self):
         self.setNick(self.users[0], "orospakr")
         self.failUnlessEqual(self.users[0].nick, "orospakr")
