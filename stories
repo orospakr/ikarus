@@ -5,7 +5,7 @@ iterations:
     end: Feb 23, 2008
     name: Iteration 1
     start: Feb 02, 08
-    velocity: 0.681818181818182
+    velocity: 0.818181818181818
   :selected: 0
 Iteration 1: 
   :list: 
@@ -96,15 +96,13 @@ Iteration 1:
     estimate: 2
     title: Channel message
   - !ruby/object:Story 
-    completed: false
+    completed: true
     description: ""
     estimate: 1
     title: -p, --port argument sets port number.
   - !ruby/object:Story 
-    completed: false
-    description: |
-      The client user actually closing the TCP socket should have the user perform the Quit operation, except with the Timeout message.
-
+    completed: true
+    description: The irc client program actually closing the TCP or timing out the socket should have the IRC object perform the Quit operation.
     estimate: 2
     title: Quitting by means of TCP reset
   - !ruby/object:Story 
@@ -141,4 +139,4 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 1
     title: Daemon
-  :selected: 11
+  :selected: 10

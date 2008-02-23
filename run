@@ -2,4 +2,4 @@
 
 # this script lets you run ikarus out of tree.
 
-PYTHONPATH=. ikarus/ikarusd.py
+PYTHONPATH=. ikarus/ikarusd.py $*
