@@ -38,32 +38,19 @@ class IRCTestCase(unittest.TestCase):
         self.users = []
         self.trs = []
         self.factory = ikarus.irc.IRCFactory()
-#         self.i = self.factory.buildProtocol(('127.0.0.1', 6667))
-#         self.i2 = self.factory.buildProtocol(('127.0.0.1', 6667))
-#         #twisted.internet.reactor.listenTCP(6667, self.factory, interface="127.0.0.1")
-
-#         #twisted.internet.reactor.iterate()
-#         self.tr = proto_helpers.StringTransport()
-#         self.tr2 = proto_helpers.StringTransport()
-#         self.users[0].makeConnection(self.tr)
-#         self.users[1].makeConnection(self.tr2)
-
-#         self.i3 = self.factory.buildProtocol(('127.0.0.1', 6667))
-#         self.tr3 = proto_helpers.StringTransport()
-#         self.i3.makeConnection(self.tr3)
         for num in range(0, 3):
             self.connectAnIRCClient()
-        #self.users[0].service = ikarus.irc.IRCFactory()
-        #self.users[0].makeConnection(self.i)
-        #self.f.protocl = ikarus.irc.IRC
 
     def testInstantiate(self):
         self.failIfEqual(self.users[0], None)
 
+    def setNick(self, u, nickname):
+        u.lineReceived("NICK %s" % nickname)
+
     def testSetNick(self):
-        self.users[0].lineReceived("NICK orospakr")
+        self.setNick(self.users[0], "orospakr")
         self.failUnlessEqual(self.users[0].nick, "orospakr")
-        self.users[0].lineReceived("NICK smartyman")
+        self.setNick(self.users[0], "smartyman")
         self.failUnlessEqual(self.users[0].nick, "smartyman")
 
     def testMalformedSetNick(self):
@@ -80,7 +67,7 @@ class IRCTestCase(unittest.TestCase):
         self.users[0].lineReceived("NOTICE AUTH :*** Found your hostname")
 
     def testLogIn(self):
-        self.users[0].lineReceived("NICK orospakr")
+        self.setNick(self.users[0], "orospakr")
         self.users[0].lineReceived("USER orospakr blahblah-pppoe.myisp.ca ircserver.awesome.org :Andrew Clunis")
         input = self.getOutputtedLines(0)
         self.failUnlessEqual(input[2], ":localhost. 001 orospakr :Welcome to $hostname.")
@@ -89,7 +76,7 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(self.users[0].logged_in, True)
 
     def testConnectionNotOpenedWithOnlyNick(self):
-        self.users[0].lineReceived("NICK orospakr")
+        self.setNick(self.users[0], "orospakr")
         self.failIfEqual(self.users[0].logged_in, True)
 
     def testConnectionNotOpenedWithOnlyUser(self):
@@ -130,7 +117,7 @@ class IRCTestCase(unittest.TestCase):
 
     def testNickInUseAlreadyLoggedIn(self):
         self.testLogIn()
-        self.users[1].lineReceived("NICK orospakr")
+        self.setNick(self.users[1], "orospakr")
         self.failUnlessEqual(self.getLastOutputtedLine(1),
                              ":localhost. 433 * orospakr :Nickname is already in use.")
 
@@ -210,7 +197,7 @@ class IRCTestCase(unittest.TestCase):
         # TODO obviously, there should be a different story here
         # when the quitted user is registered...
         self.testQuit()
-        self.users[2].lineReceived("NICK my_second_guy")
+        self.setNick(self.users[2], "my_second_guy")
 #        self.i3.lineReceived("USER msg msg lolpppoe-lolsite.dk ircserver.awesome.org :My Second guy.")
         self.failIfEqual(self.getLastOutputtedLine(2),
                          ":localhost. 433 * my_second_guy :Nickname is already in use.")
@@ -221,7 +208,7 @@ class IRCTestCase(unittest.TestCase):
         # any user that is in more than one channel with the quitting user
         # will get multiple quits. oops!
         self.testLogIn()
-        self.users[1].lineReceived("NICK secondguy")
+        self.setNick(self.users[1], "secondguy")
         self.users[1].lineReceived("USER sguy secondguy.myisp.ca localhost. :Someone.")
         self.users[0].lineReceived("JOIN #somewhere")
         self.users[1].lineReceived("JOIN #somewhere")
@@ -255,7 +242,7 @@ class IRCTestCase(unittest.TestCase):
 
     def testTwoJoinAChannel(self):
         self.testLogIn()
-        self.users[1].lineReceived("NICK my_second_guy")
+        self.setNick(self.users[1], "my_second_guy")
         self.users[1].lineReceived("USER msg localhost :Another Dude")
         self.failIfEqual(None,
                          self.factory.getUserByNick('my_second_guy'))
@@ -286,7 +273,7 @@ class IRCTestCase(unittest.TestCase):
 
     def testChannelPartUnjoinedUser(self):
         self.testLogIn()
-        self.users[1].lineReceived("NICK my_second_guy")
+        self.setNick(self.users[1], "my_second_guy")
         self.users[1].lineReceived("USER msg localhost :Someone else.")
         self.users[1].lineReceived("JOIN #channel")
         self.users[0].lineReceived("PART #channel")

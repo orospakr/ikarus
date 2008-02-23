@@ -102,6 +102,13 @@ Iteration 1:
     title: -p, --port argument sets port number.
   - !ruby/object:Story 
     completed: false
+    description: |
+      The client user actually closing the TCP socket should have the user perform the Quit operation, except with the Timeout message.
+
+    estimate: 0
+    title: Quitting by means of TCP reset
+  - !ruby/object:Story 
+    completed: false
     description: "Reply to PING packets with the standard reply as per the RFC.\n\n\
       Sender transmits:\n\n\
       PING localhost.\n\n\
@@ -142,4 +149,4 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 0
     title: Daemon
-  :selected: 8
+  :selected: 11
