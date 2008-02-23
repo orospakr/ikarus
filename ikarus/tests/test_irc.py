@@ -183,6 +183,21 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(self.getLastOutputtedLine2(),
                              "ERROR :Closing Link: my_second_guy (Client Quit)")
 
+        # also verify that the quitted user does not receive
+        # messages for a channel they joined before they quit.
+        # the idea here is to test that the channel's list of users
+        # was updated on user quit.
+        self.i2.lineReceived("PRIVMSG #mychannel :msg shouldn't be able to see this.")
+        self.failIfEqual(self.getLastOutputtedLine(),
+                         ":my_second_guy!~msg@localhost. PRIVMSG #mychannel :msg shouldn't be able to see this.")
+
+    def testShouldBeAbleToUseNickOfQuittedUser(self):
+        # the idea here is to test that the IRC factory of users
+        # was updated on user quit.
+        # TODO obviously, there should be a different story here
+        # when the quitted user is registered...
+        pass
+
     def testQuitDoesNotSendMultipleQuitMessagesToEachUser(self):
         # right now there is a silly bug, where, because transmitting the QUIT message
         # is delegated to all the channels that the user is joined to,

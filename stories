@@ -82,7 +82,8 @@ Iteration 1:
       All users in all the channels the user is joined to receive:\n\
       :orospakr!~orospakr@localhost. QUIT :Bye bye!\n\n\
       The user herself receives:\n\
-      ERROR :Closing Link: my_second_guy (Client Quit)"
+      ERROR :Closing Link: my_second_guy (Client Quit)\n\n\
+      Of course, this means that the user object is no longer included in the channel lists, nor does it receive messages to any of the formerly joined channels."
     estimate: 0
     title: Quitting by means of QUIT verb
   - !ruby/object:Story 
@@ -141,4 +142,4 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 0
     title: Daemon
-  :selected: 10
+  :selected: 8

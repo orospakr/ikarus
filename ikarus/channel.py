@@ -34,7 +34,3 @@ class Channel(object):
             user.sendLine(':%s!~%s@localhost. PART #%s :%s' % (leaver.nick, leaver.name, self.name, msg))
         self.users.remove(leaver)
 
-    def quitUser(self, quitter, msg):
-        for user in self.users:
-            user.sendLine(':%s!~%s@localhost. QUIT :%s' % (quitter.nick, quitter.name, msg))
-        self.users.remove(quitter)

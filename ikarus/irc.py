@@ -88,6 +88,9 @@ class IRC(twisted.protocols.basic.LineReceiver):
             all_users_who_care.remove(self)
             for u in all_users_who_care:
                 u.sendLine(':%s!~%s@localhost. QUIT :%s' % (self.nick, self.name, message))
+            for chan in self.joined_channels:
+                chan.users.remove(self)
+            # self.factory.users.remove(self) oops, too early
 
     def connectionMade(self):
         self.factory.registerUser(self)
