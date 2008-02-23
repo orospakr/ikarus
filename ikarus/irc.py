@@ -90,7 +90,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
                 u.sendLine(':%s!~%s@localhost. QUIT :%s' % (self.nick, self.name, message))
             for chan in self.joined_channels:
                 chan.users.remove(self)
-            # self.factory.users.remove(self) oops, too early
+            self.factory.unregisterUser(self)
 
     def connectionMade(self):
         self.factory.registerUser(self)
@@ -122,11 +122,13 @@ class IRCFactory(twisted.internet.protocol.Factory):
         for u in self.users:
             if u.nick == nick:
                 return u
-            else:
-                return None
+        return None
 
     def getChannelByName(self, name):
         for c in self.channels:
             if c.name == name:
                 return c
         return None
+
+    def unregisterUser(self, user):
+        self.users.remove(user)

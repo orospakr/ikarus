@@ -13,7 +13,11 @@ class IRCTestCase(unittest.TestCase):
     protocol.
 
     This also contains more general integration tests, based on the general
-    path of delegation from this object to the others.'''
+    path of delegation from this object to the others.
+
+    The Integration tests need to be factored out into an Integration
+    test suite, and this test case would have mocked collaborator tests only.
+    '''
 
     def getOutputtedLines(self):
         return self.tr.value().split("\r\n")
@@ -31,6 +35,14 @@ class IRCTestCase(unittest.TestCase):
         # from the string transport.
         return self.getOutputtedLines2()[-2]
 
+    def getOutputtedLines3(self):
+        return self.tr3.value().split("\r\n")
+
+    def getLastOutputtedLine3(self):
+        # not sure why, but I always get a blank line at the end of the value
+        # from the string transport.
+        return self.getOutputtedLines3()[-2]
+
     def setUp(self):
         self.factory = ikarus.irc.IRCFactory()
         self.i = self.factory.buildProtocol(('127.0.0.1', 6667))
@@ -42,6 +54,10 @@ class IRCTestCase(unittest.TestCase):
         self.tr2 = proto_helpers.StringTransport()
         self.i.makeConnection(self.tr)
         self.i2.makeConnection(self.tr2)
+
+        self.i3 = self.factory.buildProtocol(('127.0.0.1', 6667))
+        self.tr3 = proto_helpers.StringTransport()
+        self.i3.makeConnection(self.tr3)
         #self.i.service = ikarus.irc.IRCFactory()
         #self.i.makeConnection(self.i)
         #self.f.protocl = ikarus.irc.IRC
@@ -177,6 +193,8 @@ class IRCTestCase(unittest.TestCase):
         # make sure user is parted from all channels, as above, and can reconnect
         # without getting incorrect "nickname in use messages"
         self.testTwoJoinAChannel()
+        self.failIfEqual(None,
+                         self.factory.getUserByNick("my_second_guy"))
         self.i2.lineReceived("QUIT :bye bye!")
         self.failUnlessEqual(self.getLastOutputtedLine(),
                              ":my_second_guy!~msg@localhost. QUIT :bye bye!")
@@ -196,7 +214,11 @@ class IRCTestCase(unittest.TestCase):
         # was updated on user quit.
         # TODO obviously, there should be a different story here
         # when the quitted user is registered...
-        pass
+        self.testQuit()
+        self.i3.lineReceived("NICK my_second_guy")
+#        self.i3.lineReceived("USER msg msg lolpppoe-lolsite.dk ircserver.awesome.org :My Second guy.")
+        self.failIfEqual(self.getLastOutputtedLine3(),
+                         ":localhost. 433 * my_second_guy :Nickname is already in use.")
 
     def testQuitDoesNotSendMultipleQuitMessagesToEachUser(self):
         # right now there is a silly bug, where, because transmitting the QUIT message
@@ -240,9 +262,17 @@ class IRCTestCase(unittest.TestCase):
         self.testLogIn()
         self.i2.lineReceived("NICK my_second_guy")
         self.i2.lineReceived("USER msg localhost :Another Dude")
+        self.failIfEqual(None,
+                         self.factory.getUserByNick('my_second_guy'))
         self.i.lineReceived("JOIN #mychannel")
         self.i2.lineReceived("JOIN #mychannel")
         self.failUnlessEqual(self.getLastOutputtedLine(), ":my_second_guy!~msg@localhost. JOIN :#mychannel")
+
+    def testUserThatHasOnlyDoneNickAndNotUserCanBePunted(self):
+        # test that a second session that calls NICK for the
+        # same name can punt off another session that has already
+        # called nick, but has not yet called USER.
+        pass
 
     def testGetChannelByName(self):
         self.testJoinANewChannel()
