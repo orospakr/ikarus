@@ -13,6 +13,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
         self.nick = None
         self.name = None
         self.joined_channels = []
+        self.has_quit = False
 
     def lineReceived(self, line):
         items = line.split(" ")
@@ -80,17 +81,24 @@ class IRC(twisted.protocols.basic.LineReceiver):
         elif items[0] == "QUIT":
             message_start = len("QUIT ") + 1 # +1 to skip the colon
             message = line[message_start:]
+            self.doQuit(message, False)
+
+    def doQuit(self, message, no_connection):
+        if not no_connection:
             self.sendLine("ERROR :Closing Link: my_second_guy (Client Quit)")
-            all_users_who_care = set([])
-            for chan in self.joined_channels:
-                all_users_who_care = all_users_who_care.union(
-                    chan.users)
+        logging.debug("User %s is quitting, reason: %s" % (self.nick, message))
+        all_users_who_care = set([])
+        for chan in self.joined_channels:
+            all_users_who_care = all_users_who_care.union(
+               chan.users)
+        if not len(self.joined_channels) < 1:
             all_users_who_care.remove(self)
-            for u in all_users_who_care:
-                u.sendLine(':%s!~%s@localhost. QUIT :%s' % (self.nick, self.name, message))
-            for chan in self.joined_channels:
-                chan.users.remove(self)
-            self.factory.unregisterUser(self)
+        for u in all_users_who_care:
+            u.sendLine(':%s!~%s@localhost. QUIT :%s' % (self.nick, self.name, message))
+        for chan in self.joined_channels:
+            chan.users.remove(self)
+        self.factory.unregisterUser(self)
+        self.has_quit = True
 
     def connectionMade(self):
         self.factory.registerUser(self)
@@ -104,6 +112,14 @@ class IRC(twisted.protocols.basic.LineReceiver):
         self.sendLine(":localhost. 001 %s :Welcome to $hostname." % self.nick)
         self.sendLine(":localhost. 002 %s :Your host is $hostname running version Ikarus" % self.nick)
         self.sendLine("NOTICE orospakr :*** Your host is $hostname running version Ikarus")
+
+    def connectionLost(self, reason):
+        if not reason.__class__ is str:
+            logging.debug(reason.printDetailedTraceback())
+            pass
+        if not self.has_quit:
+            self.doQuit(reason, True)
+        self.transport = None
 
 class IRCFactory(twisted.internet.protocol.Factory):
     protocol = IRC

@@ -3,6 +3,8 @@ from twisted.test import proto_helpers
 
 import twisted.internet
 import twisted.internet.reactor
+import twisted.python.failure
+from twisted.internet import error
 
 import ikarus.irc
 import logging
@@ -220,6 +222,7 @@ class IRCTestCase(unittest.TestCase):
         self.users[0].lineReceived("JOIN #somewhere_else")
         self.users[1].lineReceived("JOIN #somewhere_else")
         self.users[1].lineReceived("QUIT :hasta la vista!")
+        self.users[1].connectionLost("socket lolbai!")
 
         lines = self.getOutputtedLines(0)
 
@@ -231,8 +234,16 @@ class IRCTestCase(unittest.TestCase):
         # make sure the single message does arrive.
         self.failUnlessEqual(second_returned_statement, "QUIT")
 
-    def testConnectionLost(self):
+
+    def testUserClosesConnectionBeforeLogIn(self):
+        # I think this screws up right now.
         pass
+
+    def testConnectionLost(self):
+        self.testTwoJoinAChannel()
+        self.users[1].connectionLost("lost_socket")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
+                             ":my_second_guy!~msg@localhost. QUIT :lost_socket")
 
     def testChanneListIsUpdatedOnJoin(self):
         def channelToName(c):
@@ -260,6 +271,13 @@ class IRCTestCase(unittest.TestCase):
         # same name can punt off another session that has already
         # called nick, but has not yet called USER.
         pass
+
+    def testSendLineShouldFailSilentlyAfterConnectionLost(self):
+        # actually, this doesn't actually test what we think.
+        # because the underlying transport during testing
+        # is the StringTransport, the error throwing is never done.
+        self.users[0].connectionLost(twisted.python.failure.Failure(error.ConnectionDone("obooo")))
+        self.users[0].sendLine("lol, internet")
 
     def testGetChannelByName(self):
         self.testJoinANewChannel()

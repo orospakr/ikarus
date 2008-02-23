@@ -2,22 +2,22 @@
 iterations: 
   :list: 
   - !ruby/object:Iteration 
-    end: ""
+    end: Feb 23, 2008
     name: Iteration 1
-    start: ""
-    velocity: 0.0
+    start: Feb 02, 08
+    velocity: 0.681818181818182
   :selected: 0
 Iteration 1: 
   :list: 
   - !ruby/object:Story 
     completed: true
     description: Open a socket, and mirror the user's messages.
-    estimate: 0
+    estimate: 1
     title: Accept a connection
   - !ruby/object:Story 
     completed: true
     description: Mirror the users' messages to all others.
-    estimate: 0
+    estimate: 1
     title: Accept multiple connections
   - !ruby/object:Story 
     completed: true
@@ -25,14 +25,14 @@ Iteration 1:
       Remove test echoing logic.
       
       Wait USER and NICK commands to set logged in state.
-    estimate: 0
+    estimate: 2
     title: User login as per RFC 1549.
   - !ruby/object:Story 
     completed: true
     description: "Return\n\n\
       :localhost. 431  :No nickname given\n\n\
       as per the RFC."
-    estimate: 0
+    estimate: 1
     title: Return error for bad NICK
   - !ruby/object:Story 
     completed: true
@@ -41,7 +41,7 @@ Iteration 1:
       Perform hostname lookup (with a deferred), and have callback print:
       NOTICE AUTH :*** Found your hostname
 
-    estimate: 0
+    estimate: 1
     title: Hostname Lookup and Connect status messages
   - !ruby/object:Story 
     completed: true
@@ -53,14 +53,14 @@ Iteration 1:
       :localhost. 003 orospakr :This server was cobbled together Thu Nov  9 03:18:35 UTC 2006\n\
       :localhost. 004 orospakr localhost. dancer-ircd-1.0.36 aAbBcCdDeEfFGhHiIjkKlLmMnNopPQrRsStuUvVwWxXyYzZ0123459*@ bcdefFhiIklmnoPqstv\n\
       :localhost. 005 orospakr MODES=4 CHANLIMIT=#:20 NICKLEN=16 USERLEN=10 HOSTLEN=63 TOPICLEN=450 KICKLEN=450 CHANNELLEN=30 KEYLEN=23 CHANTYPES=# PREFIX=(ov)@+ CASEMAPPING=ascii CAPAB IRCD=dancer :are available on this servert"
-    estimate: 0
+    estimate: 1
     title: Login Status Messages
   - !ruby/object:Story 
     completed: true
     description: "Return\n\n\
       :localhost. 461 * USER :Not enough parameters\n\n\
       as per RFC."
-    estimate: 0
+    estimate: 1
     title: Return error for bad USER
   - !ruby/object:Story 
     completed: true
@@ -73,7 +73,7 @@ Iteration 1:
       PART #mychannel :I'm outta here!\n\
       All users in the channel receive (including the formerly joined user herself):\n\
       :orospakr!~orospakr@localhost. PART #another_channel :I'm outta here!\n\n"
-    estimate: 0
+    estimate: 2
     title: Join and part channels, as RFC 1549
   - !ruby/object:Story 
     completed: true
@@ -84,7 +84,7 @@ Iteration 1:
       The user herself receives:\n\
       ERROR :Closing Link: my_second_guy (Client Quit)\n\n\
       Of course, this means that the user object is no longer included in the channel lists, nor does it receive messages to any of the formerly joined channels."
-    estimate: 0
+    estimate: 3
     title: Quitting by means of QUIT verb
   - !ruby/object:Story 
     completed: true
@@ -93,19 +93,19 @@ Iteration 1:
       PRIVMSG #mychannel :whee.\n\n\
       All other users see (but not the original sender, IRC being asynchronous and all):\n\n\
       :orospakr!~orospakr@localhost. PRIVMSG #mychannel :whee.\n\n"
-    estimate: 0
+    estimate: 2
     title: Channel message
   - !ruby/object:Story 
     completed: false
     description: ""
-    estimate: 0
+    estimate: 1
     title: -p, --port argument sets port number.
   - !ruby/object:Story 
     completed: false
     description: |
       The client user actually closing the TCP socket should have the user perform the Quit operation, except with the Timeout message.
 
-    estimate: 0
+    estimate: 2
     title: Quitting by means of TCP reset
   - !ruby/object:Story 
     completed: false
@@ -113,33 +113,25 @@ Iteration 1:
       Sender transmits:\n\n\
       PING localhost.\n\n\
       :localhost. PONG localhost. :someotherguy"
-    estimate: 0
+    estimate: 2
     title: Ping? PONG!!!11
   - !ruby/object:Story 
     completed: false
     description: Allow users to register a permanent account by means of `/msg nickserv register`.
-    estimate: 0
+    estimate: 2
     title: Account registration
   - !ruby/object:Story 
     completed: false
     description: Allow user to login by means of PASS, or by means of /msg nickserv identify.
-    estimate: 0
+    estimate: 2
     title: Account login
-  - !ruby/object:Story 
-    completed: false
-    description: |-
-      Remember users nicknames and passwords for authentication.
-      
-      If a user is unregistered, do not persist them.
-    estimate: 0
-    title: Persist users
   - !ruby/object:Story 
     completed: false
     description: |-
       Allow users to transmit full UTF-8 text messages.
       
       (this story shouldn't require any new code, just tests)
-    estimate: 0
+    estimate: 1
     title: UTF8
   - !ruby/object:Story 
     completed: false
@@ -147,6 +139,6 @@ Iteration 1:
       Daemonize, unless -f or --foreground is passed.
       
       -f and --f maybe should implicitly set logging to verbose.
-    estimate: 0
+    estimate: 1
     title: Daemon
   :selected: 11
