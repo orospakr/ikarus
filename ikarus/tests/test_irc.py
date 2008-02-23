@@ -241,9 +241,12 @@ class IRCTestCase(unittest.TestCase):
 
     def testConnectionLost(self):
         self.testTwoJoinAChannel()
-        self.users[1].connectionLost("lost_socket")
+
+        from twisted.internet.main import CONNECTION_LOST
+        self.users[1].connectionLost(twisted.python.failure.Failure(CONNECTION_LOST))
+
         self.failUnlessEqual(self.getLastOutputtedLine(0),
-                             ":my_second_guy!~msg@localhost. QUIT :lost_socket")
+                             ":my_second_guy!~msg@localhost. QUIT :Connection to the other side was lost in a non-clean fashion: Connection lost.")
 
     def testChanneListIsUpdatedOnJoin(self):
         def channelToName(c):

@@ -1,5 +1,6 @@
 import twisted.protocols.basic
 import twisted.internet.protocol
+from twisted.internet import error
 import logging
 
 import ikarus.channel
@@ -114,12 +115,15 @@ class IRC(twisted.protocols.basic.LineReceiver):
         self.sendLine("NOTICE orospakr :*** Your host is $hostname running version Ikarus")
 
     def connectionLost(self, reason):
-        if not reason.__class__ is str:
-            logging.debug(reason.printDetailedTraceback())
-            pass
         if not self.has_quit:
-            self.doQuit(reason, True)
-        self.transport = None
+            # TODO I should interpret the error states in
+            # reason as twisted.python.error, and give
+            # more traditional IRC connection error
+            # messages.
+            logging.debug("connection was lost, without already quitting..")
+            self.doQuit(reason.getErrorMessage(), True)
+        else:
+            logging.debug("connection was lost, with already having quit.")
 
 class IRCFactory(twisted.internet.protocol.Factory):
     protocol = IRC
