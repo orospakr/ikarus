@@ -31,7 +31,7 @@ Iteration 1:
       
       Wait USER and NICK commands to set logged in state.
     estimate: 2
-    title: User login as per RFC 1549.
+    title: User login as per RFC 1549
   - !ruby/object:Story 
     completed: true
     description: "Return\n\n\
@@ -112,6 +112,22 @@ Iteration 1:
     title: Quitting by means of TCP reset
   - !ruby/object:Story 
     completed: false
+    description: "Implement the WHO verb, as per the RFC.\n\n\
+      Asking client sends: WHO #<channel_name>\n\n\
+      For each user (including the asking user) in the channel, lines are transmitted in the form below for each user:\n\
+      :localhost. 352 <requesting_user> #<channel_name> <user_name> <user_hostname> <server_hostname> <user_nick> <modes> :<hopcount> Andrew Clunis\n\n\
+      <modes> begins with either H or G (here or gone for away status), plus any other modes that might be set.  (r is for registered)\n\
+      <hopcount> is always 0, because this system has no server linking, of course.\n\n\
+      The list is the terminated by a line in the form:\n\
+      :localhost. 315 <requesting_user> #<channel_name> :End of /WHO list.\n\n\
+      Example:\n\
+      :localhost. 352 someotherguy #mychannel ~orospakr localhost. irc.localnet someotherguy H :0 Andrew Clunis\r\n\
+      :localhost. 352 someotherguy #mychannel ~orospakr localhost. irc.localnet orospakr H@ :0 Andrew Clunis\r\n\
+      :localhost. 315 someotherguy #mychannel :End of /WHO list."
+    estimate: 0
+    title: Channel user lists
+  - !ruby/object:Story 
+    completed: false
     description: "Reply to PING packets with the standard reply as per the RFC.\n\n\
       Sender transmits:\n\n\
       PING localhost.\n\n\
@@ -146,7 +162,6 @@ Iteration 1:
     title: Daemon
   :selected: 14
 Iteration 2: 
-  :selected: 1
   :list: 
   - !ruby/object:Story 
     completed: false
@@ -160,7 +175,7 @@ Iteration 2:
     title: kline
   - !ruby/object:Story 
     completed: false
-    description: ""
+    description: Implement user to user CTCP messages, as per the RFC.
     estimate: 2
     title: CTCP message support
   - !ruby/object:Story 
@@ -169,5 +184,6 @@ Iteration 2:
       Any user sending too many CTCP messages will be removed.
       
       Any user receiving too many CTCP messages will cause those messages to be dropped and logged, to prevent more distributed flood attacks.
-    estimate: 1
+    estimate: 2
     title: CTCP flood protection
+  :selected: 1
