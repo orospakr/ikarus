@@ -19,143 +19,138 @@ class IRCTestCase(unittest.TestCase):
     test suite, and this test case would have mocked collaborator tests only.
     '''
 
-    def getOutputtedLines(self):
-        return self.tr.value().split("\r\n")
+    def getOutputtedLines(self, num):
+        return self.trs[num].value().split("\r\n")
 
-    def getLastOutputtedLine(self):
+    def getLastOutputtedLine(self, num):
         # not sure why, but I always get a blank line at the end of the value
         # from the string transport.
-        return self.getOutputtedLines()[-2]
+        return self.getOutputtedLines(num)[-2]
 
-    def getOutputtedLines2(self):
-        return self.tr2.value().split("\r\n")
-
-    def getLastOutputtedLine2(self):
-        # not sure why, but I always get a blank line at the end of the value
-        # from the string transport.
-        return self.getOutputtedLines2()[-2]
-
-    def getOutputtedLines3(self):
-        return self.tr3.value().split("\r\n")
-
-    def getLastOutputtedLine3(self):
-        # not sure why, but I always get a blank line at the end of the value
-        # from the string transport.
-        return self.getOutputtedLines3()[-2]
+    def connectAnIRCClient(self):
+        new_user = self.factory.buildProtocol(('127.0.0.1', 6667))
+        self.users.append(new_user)
+        new_tr = proto_helpers.StringTransport()
+        self.trs.append(new_tr)
+        new_user.makeConnection(new_tr)
 
     def setUp(self):
+        self.users = []
+        self.trs = []
         self.factory = ikarus.irc.IRCFactory()
-        self.i = self.factory.buildProtocol(('127.0.0.1', 6667))
-        self.i2 = self.factory.buildProtocol(('127.0.0.1', 6667))
-        #twisted.internet.reactor.listenTCP(6667, self.factory, interface="127.0.0.1")
+#         self.i = self.factory.buildProtocol(('127.0.0.1', 6667))
+#         self.i2 = self.factory.buildProtocol(('127.0.0.1', 6667))
+#         #twisted.internet.reactor.listenTCP(6667, self.factory, interface="127.0.0.1")
 
-        #twisted.internet.reactor.iterate()
-        self.tr = proto_helpers.StringTransport()
-        self.tr2 = proto_helpers.StringTransport()
-        self.i.makeConnection(self.tr)
-        self.i2.makeConnection(self.tr2)
+#         #twisted.internet.reactor.iterate()
+#         self.tr = proto_helpers.StringTransport()
+#         self.tr2 = proto_helpers.StringTransport()
+#         self.users[0].makeConnection(self.tr)
+#         self.users[1].makeConnection(self.tr2)
 
-        self.i3 = self.factory.buildProtocol(('127.0.0.1', 6667))
-        self.tr3 = proto_helpers.StringTransport()
-        self.i3.makeConnection(self.tr3)
-        #self.i.service = ikarus.irc.IRCFactory()
-        #self.i.makeConnection(self.i)
+#         self.i3 = self.factory.buildProtocol(('127.0.0.1', 6667))
+#         self.tr3 = proto_helpers.StringTransport()
+#         self.i3.makeConnection(self.tr3)
+        for num in range(0, 3):
+            self.connectAnIRCClient()
+        #self.users[0].service = ikarus.irc.IRCFactory()
+        #self.users[0].makeConnection(self.i)
         #self.f.protocl = ikarus.irc.IRC
 
     def testInstantiate(self):
-        self.failIfEqual(self.i, None)
+        self.failIfEqual(self.users[0], None)
 
     def testSetNick(self):
-        self.i.lineReceived("NICK orospakr")
-        self.failUnlessEqual(self.i.nick, "orospakr")
-        self.i.lineReceived("NICK smartyman")
-        self.failUnlessEqual(self.i.nick, "smartyman")
+        self.users[0].lineReceived("NICK orospakr")
+        self.failUnlessEqual(self.users[0].nick, "orospakr")
+        self.users[0].lineReceived("NICK smartyman")
+        self.failUnlessEqual(self.users[0].nick, "smartyman")
 
     def testMalformedSetNick(self):
-        self.i.lineReceived("NICK")
-        input = self.getLastOutputtedLine()
+        self.users[0].lineReceived("NICK")
+        input = self.getLastOutputtedLine(0)
         self.failUnlessEqual(input, ":localhost. 431  :No nickname given")
 
     def testSetUser(self):
-        self.i.lineReceived("USER orospakr orospakrshostname localhost :Andrew Clunis")
-        self.failUnlessEqual(self.i.name, "orospakr")
+        self.users[0].lineReceived("USER orospakr orospakrshostname localhost :Andrew Clunis")
+        self.failUnlessEqual(self.users[0].name, "orospakr")
 
     def testConnectionOpened(self):
-        self.i.lineReceived("NOTICE AUTH :*** Looking up your hostname...")
-        self.i.lineReceived("NOTICE AUTH :*** Found your hostname")
+        self.users[0].lineReceived("NOTICE AUTH :*** Looking up your hostname...")
+        self.users[0].lineReceived("NOTICE AUTH :*** Found your hostname")
 
     def testLogIn(self):
-        self.i.lineReceived("NICK orospakr")
-        self.i.lineReceived("USER orospakr blahblah-pppoe.myisp.ca ircserver.awesome.org :Andrew Clunis")
-        input = self.getOutputtedLines()
+        self.users[0].lineReceived("NICK orospakr")
+        self.users[0].lineReceived("USER orospakr blahblah-pppoe.myisp.ca ircserver.awesome.org :Andrew Clunis")
+        input = self.getOutputtedLines(0)
         self.failUnlessEqual(input[2], ":localhost. 001 orospakr :Welcome to $hostname.")
         self.failUnlessEqual(input[3], ":localhost. 002 orospakr :Your host is $hostname running version Ikarus")
         self.failUnlessEqual(input[4], "NOTICE orospakr :*** Your host is $hostname running version Ikarus")
-        self.failUnlessEqual(self.i.logged_in, True)
+        self.failUnlessEqual(self.users[0].logged_in, True)
 
     def testConnectionNotOpenedWithOnlyNick(self):
-        self.i.lineReceived("NICK orospakr")
-        self.failIfEqual(self.i.logged_in, True)
+        self.users[0].lineReceived("NICK orospakr")
+        self.failIfEqual(self.users[0].logged_in, True)
 
     def testConnectionNotOpenedWithOnlyUser(self):
-        self.i.lineReceived("USER orospakr orospakr localhost :Andrew Clunis")
-        self.failIfEqual(self.i.logged_in, True)
+        self.users[0].lineReceived("USER orospakr orospakr localhost :Andrew Clunis")
+        self.failIfEqual(self.users[0].logged_in, True)
 
     def testMalformedSetUser(self):
-        self.i.lineReceived("USER")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters.")
+        self.users[0].lineReceived("USER")
+        self.failUnlessEqual(self.getLastOutputtedLine(0), ":localhost. 461 * USER :Not enough parameters.")
 
     def testMalformedSetUserAlmostLongEnough(self):
-        self.i.lineReceived("USER whee whee whee")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":localhost. 461 * USER :Not enough parameters.")
+        self.users[0].lineReceived("USER whee whee whee")
+        self.failUnlessEqual(self.getLastOutputtedLine(0), ":localhost. 461 * USER :Not enough parameters.")
 
     def testJoinANewChannel(self):
         self.testLogIn()
-        self.i.lineReceived("JOIN #my_channel")
+        self.users[0].lineReceived("JOIN #my_channel")
         # I should test the presence of channel logged in info here, once it exists
         # expect callback here.
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":orospakr!~orospakr@localhost. JOIN :#my_channel")
+        self.failUnlessEqual(self.getLastOutputtedLine(0), ":orospakr!~orospakr@localhost. JOIN :#my_channel")
 
     def testMalformedChannelJoin(self):
         self.testLogIn()
-        self.i.lineReceived("JOIN")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[0].lineReceived("JOIN")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 461 * JOIN :Not enough parameters.")
 
     def testMalformedChannelPrivmsg(self):
         self.testJoinANewChannel()
-        self.i.lineReceived("PRIVMSG #mychannel")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[0].lineReceived("PRIVMSG #mychannel")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 461 * PRIVMSG :Not enough parameters.")
 
     def testJoinBeforeLoginShouldFail(self):
-        self.i.lineReceived("JOIN #mychannel")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 451 JOIN :You have not registered.")
 
     def testNickInUseAlreadyLoggedIn(self):
         self.testLogIn()
-        self.i2.lineReceived("NICK orospakr")
-        self.failUnlessEqual(self.getLastOutputtedLine2(),
+        self.users[1].lineReceived("NICK orospakr")
+        self.failUnlessEqual(self.getLastOutputtedLine(1),
                              ":localhost. 433 * orospakr :Nickname is already in use.")
 
     def testPart(self):
         # make sure that the user is removed from the channel and does not receive
         # new messages.
         self.testTwoJoinAChannel()
-        self.i.lineReceived("PART #mychannel :Bye bye.")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[0].lineReceived("PART #mychannel :Bye bye.")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":orospakr!~orospakr@localhost. PART #mychannel :Bye bye.")
-        self.failUnlessEqual(self.getLastOutputtedLine2(),
+        self.failUnlessEqual(self.getLastOutputtedLine(1),
                              ":orospakr!~orospakr@localhost. PART #mychannel :Bye bye.")
-        self.i.lineReceived("PRIVMSG #mychannel :Lorem Ipsum...")
-        self.failIfEqual(self.getLastOutputtedLine2(),
+        self.users[0].lineReceived("PRIVMSG #mychannel :Lorem Ipsum...")
+        self.failIfEqual(self.getLastOutputtedLine(1),
                          ":orospakr!~orospakr@localhost. PRIVMSG #mychannel :Lorem Ipsum...")
 
     def testMalformedPart(self):
         self.testTwoJoinAChannel()
-        self.i.lineReceived("PART")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[0].lineReceived("PART")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 461 orospakr PART :Not enough parameters.")
 
     def testPartFromThreeChannels(self):
@@ -163,11 +158,11 @@ class IRCTestCase(unittest.TestCase):
         # if we got that, the test above tested the rest of the removal logic
         # sufficiently.
         self.testLogIn()
-        self.i.lineReceived("JOIN #firstchannel")
-        self.i.lineReceived("JOIN #mychannel")
-        self.i.lineReceived("JOIN #another_channel")
-        self.i.lineReceived("PART #firstchannel,#mychannel,#another_channel :I'm outta here!")
-        lines = self.getOutputtedLines()
+        self.users[0].lineReceived("JOIN #firstchannel")
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[0].lineReceived("JOIN #another_channel")
+        self.users[0].lineReceived("PART #firstchannel,#mychannel,#another_channel :I'm outta here!")
+        lines = self.getOutputtedLines(0)
         self.failUnlessEqual(lines[-3],
                              ":orospakr!~orospakr@localhost. PART #mychannel :I'm outta here!")
         self.failUnlessEqual(lines[-2],
@@ -177,16 +172,16 @@ class IRCTestCase(unittest.TestCase):
 #     must always be there, so why bother making it flexible just because dancer is?
 #     def testPartMalformedMessageMissingColon(self):
 #         self.testLogIn()
-#         self.i.lineReceived("JOIN #mychannel")
-#         self.i.lineReceived("PART #mychannel no colon, but it should still work!")
-#         self.failUnlessEqual(self.getLastOutputtedLine(),
+#         self.users[0].lineReceived("JOIN #mychannel")
+#         self.users[0].lineReceived("PART #mychannel no colon, but it should still work!")
+#         self.failUnlessEqual(self.getLastOutputtedLine(0),
 #                              ":orospakr!~orospakr@localhost. PART #mychannel :no colon, but it should still work!")
 
     def testPartFromNonExistentChannel(self):
         # this should be tested in this testcase.
         self.testLogIn()
-        self.i.lineReceived("PART #doesnotexist")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[0].lineReceived("PART #doesnotexist")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 403 orospakr #doesnotexist :That channel doesn't exist.")
 
     def testQuit(self):
@@ -195,18 +190,18 @@ class IRCTestCase(unittest.TestCase):
         self.testTwoJoinAChannel()
         self.failIfEqual(None,
                          self.factory.getUserByNick("my_second_guy"))
-        self.i2.lineReceived("QUIT :bye bye!")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[1].lineReceived("QUIT :bye bye!")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":my_second_guy!~msg@localhost. QUIT :bye bye!")
-        self.failUnlessEqual(self.getLastOutputtedLine2(),
+        self.failUnlessEqual(self.getLastOutputtedLine(1),
                              "ERROR :Closing Link: my_second_guy (Client Quit)")
 
         # also verify that the quitted user does not receive
         # messages for a channel they joined before they quit.
         # the idea here is to test that the channel's list of users
         # was updated on user quit.
-        self.i2.lineReceived("PRIVMSG #mychannel :msg shouldn't be able to see this.")
-        self.failIfEqual(self.getLastOutputtedLine(),
+        self.users[1].lineReceived("PRIVMSG #mychannel :msg shouldn't be able to see this.")
+        self.failIfEqual(self.getLastOutputtedLine(0),
                          ":my_second_guy!~msg@localhost. PRIVMSG #mychannel :msg shouldn't be able to see this.")
 
     def testShouldBeAbleToUseNickOfQuittedUser(self):
@@ -215,9 +210,9 @@ class IRCTestCase(unittest.TestCase):
         # TODO obviously, there should be a different story here
         # when the quitted user is registered...
         self.testQuit()
-        self.i3.lineReceived("NICK my_second_guy")
+        self.users[2].lineReceived("NICK my_second_guy")
 #        self.i3.lineReceived("USER msg msg lolpppoe-lolsite.dk ircserver.awesome.org :My Second guy.")
-        self.failIfEqual(self.getLastOutputtedLine3(),
+        self.failIfEqual(self.getLastOutputtedLine(2),
                          ":localhost. 433 * my_second_guy :Nickname is already in use.")
 
     def testQuitDoesNotSendMultipleQuitMessagesToEachUser(self):
@@ -226,15 +221,15 @@ class IRCTestCase(unittest.TestCase):
         # any user that is in more than one channel with the quitting user
         # will get multiple quits. oops!
         self.testLogIn()
-        self.i2.lineReceived("NICK secondguy")
-        self.i2.lineReceived("USER sguy secondguy.myisp.ca localhost. :Someone.")
-        self.i.lineReceived("JOIN #somewhere")
-        self.i2.lineReceived("JOIN #somewhere")
-        self.i.lineReceived("JOIN #somewhere_else")
-        self.i2.lineReceived("JOIN #somewhere_else")
-        self.i2.lineReceived("QUIT :hasta la vista!")
+        self.users[1].lineReceived("NICK secondguy")
+        self.users[1].lineReceived("USER sguy secondguy.myisp.ca localhost. :Someone.")
+        self.users[0].lineReceived("JOIN #somewhere")
+        self.users[1].lineReceived("JOIN #somewhere")
+        self.users[0].lineReceived("JOIN #somewhere_else")
+        self.users[1].lineReceived("JOIN #somewhere_else")
+        self.users[1].lineReceived("QUIT :hasta la vista!")
 
-        lines = self.getOutputtedLines()
+        lines = self.getOutputtedLines(0)
 
         # check to see if the first user got an extra QUIT line back.
         first_returned_statement = lines[-3].split(" ")[1]
@@ -253,20 +248,20 @@ class IRCTestCase(unittest.TestCase):
         self.testLogIn()
         chans = ["mychannel", "somechannel", "anotherplace"]
         for c in chans:
-            self.i.lineReceived("JOIN #%s" % c)
-        joined_channel_names = map(channelToName, self.i.joined_channels)
+            self.users[0].lineReceived("JOIN #%s" % c)
+        joined_channel_names = map(channelToName, self.users[0].joined_channels)
         for c in chans:
             self.failUnlessEqual(True, c in joined_channel_names)
 
     def testTwoJoinAChannel(self):
         self.testLogIn()
-        self.i2.lineReceived("NICK my_second_guy")
-        self.i2.lineReceived("USER msg localhost :Another Dude")
+        self.users[1].lineReceived("NICK my_second_guy")
+        self.users[1].lineReceived("USER msg localhost :Another Dude")
         self.failIfEqual(None,
                          self.factory.getUserByNick('my_second_guy'))
-        self.i.lineReceived("JOIN #mychannel")
-        self.i2.lineReceived("JOIN #mychannel")
-        self.failUnlessEqual(self.getLastOutputtedLine(), ":my_second_guy!~msg@localhost. JOIN :#mychannel")
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[1].lineReceived("JOIN #mychannel")
+        self.failUnlessEqual(self.getLastOutputtedLine(0), ":my_second_guy!~msg@localhost. JOIN :#mychannel")
 
     def testUserThatHasOnlyDoneNickAndNotUserCanBePunted(self):
         # test that a second session that calls NICK for the
@@ -285,16 +280,16 @@ class IRCTestCase(unittest.TestCase):
 
     def testOneSpeaksToAnotherOnOneChannel(self):
         self.testTwoJoinAChannel()
-        self.i.lineReceived("PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
-        input2 = self.tr2.value().split("\r\n")
+        self.users[0].lineReceived("PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
+        input2 = self.trs[1].value().split("\r\n")
         self.failUnlessEqual(input2[-2], ":orospakr!~orospakr@localhost. PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
 
     def testChannelPartUnjoinedUser(self):
         self.testLogIn()
-        self.i2.lineReceived("NICK my_second_guy")
-        self.i2.lineReceived("USER msg localhost :Someone else.")
-        self.i2.lineReceived("JOIN #channel")
-        self.i.lineReceived("PART #channel")
-        self.failUnlessEqual(self.getLastOutputtedLine(),
+        self.users[1].lineReceived("NICK my_second_guy")
+        self.users[1].lineReceived("USER msg localhost :Someone else.")
+        self.users[1].lineReceived("JOIN #channel")
+        self.users[0].lineReceived("PART #channel")
+        self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 422 orospakr #channel :You're not on that channel.")
 
