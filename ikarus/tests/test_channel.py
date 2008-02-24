@@ -34,6 +34,8 @@ class ChannelTestCase(unittest.TestCase):
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":clevernickname!~nobody@localhost. JOIN :#coolpeopleonly"))
         self.irc_factory.users.append(user)
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 clevernickname = #coolpeopleonly :clevernickname"))
         chan.joinUser(user)
 
         other_user = pmock.Mock()
@@ -44,6 +46,8 @@ class ChannelTestCase(unittest.TestCase):
                 ":spam_and_eggs!~someone_else@localhost. JOIN :#coolpeopleonly"))
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":spam_and_eggs!~someone_else@localhost. JOIN :#coolpeopleonly"))
+        other_user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 spam_and_eggs = #coolpeopleonly :clevernickname spam_and_eggs"))
         self.irc_factory.users.append(other_user)
         chan.joinUser(other_user)
 
@@ -58,6 +62,8 @@ class ChannelTestCase(unittest.TestCase):
         user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 orospakr = #mychannel :orospakr"))
         self.irc_factory.users.append(user)
         self.c.joinUser(user)
         found_user = self.c.findUser("orospakr")
@@ -76,6 +82,8 @@ class ChannelTestCase(unittest.TestCase):
         self.joining_user.joined_channels = []
         self.joining_user.expects(pmock.once()).sendLine(pmock.eq(
                 ":somefella!~sfella@localhost. JOIN :#mychannel"))
+        self.joining_user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 somefella = #mychannel :somefella"))
         self.irc_factory.users.append(self.joining_user)
         self.c.joinUser(self.joining_user)
         self.joining_user.verify()
@@ -88,6 +96,8 @@ class ChannelTestCase(unittest.TestCase):
         self.listening_user.expects(pmock.once()).sendLine(pmock.eq(
                 ":listening_guy!~listening_guy@localhost. JOIN :#mychannel"))
         self.listening_user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 listening_guy = #mychannel :listening_guy"))
+        self.listening_user.expects(pmock.once()).sendLine(pmock.eq(
                 ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
         self.irc_factory.users.append(self.listening_user)
 
@@ -97,6 +107,8 @@ class ChannelTestCase(unittest.TestCase):
         self.user.joined_channels = []
         self.user.expects(pmock.once()).sendLine(pmock.eq(
                 ":orospakr!~orospakr@localhost. JOIN :#mychannel"))
+        self.user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 orospakr = #mychannel :listening_guy orospakr"))
         self.irc_factory.users.append(self.user)
 
         self.c.joinUser(self.listening_user)
@@ -129,6 +141,8 @@ class ChannelTestCase(unittest.TestCase):
         user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":someone!~sone@localhost. JOIN :#mychannel"))
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 someone = #mychannel :someone"))
         self.c.joinUser(user)
         naughty_user = pmock.Mock()
         naughty_user.nick = "naughtyguy"
@@ -145,6 +159,8 @@ class ChannelTestCase(unittest.TestCase):
         user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":someone!~sone@localhost. JOIN :#mychannel"))
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 353 someone = #mychannel :someone"))
         self.c.joinUser(user)
 
         user.expects(pmock.once()).sendLine(pmock.eq(
@@ -171,7 +187,7 @@ class ChannelTestCase(unittest.TestCase):
         user.name = "fp"
         user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(':first_person!~fp@localhost. JOIN :#mychannel'))
-
+#        user.expects(pmock.once()).sendLine(pmock.eq(':localhost.
         self.c.joinUser(user)
 
         user.expects(pmock.once()).sendLine(pmock.eq(

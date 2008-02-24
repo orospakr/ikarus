@@ -8,8 +8,12 @@ class Channel(object):
     def joinUser(self, user):
         self.users.append(user)
         user.joined_channels.append(self)
+        nick_list = ""
         for u in self.users:
             u.sendLine(":%s!~%s@localhost. JOIN :#%s" % (user.nick, user.name, self.name))
+            nick_list += u.nick + ' '
+        nick_list = nick_list.strip()
+        user.sendLine(":localhost. 353 %s = #%s :%s" %(user.nick, self.name, nick_list))
 
     def findUser(self, nick):
         for user in self.users:
