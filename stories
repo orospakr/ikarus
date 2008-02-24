@@ -160,7 +160,7 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 1
     title: Daemon
-  :selected: 14
+  :selected: 12
 Iteration 2: 
   :list: 
   - !ruby/object:Story 

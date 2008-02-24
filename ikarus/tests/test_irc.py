@@ -306,3 +306,14 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 422 orospakr #channel :You're not on that channel.")
 
+    def testWhoReturnsUserList(self):
+        self.testTwoJoinAChannel()
+        self.users[0].lineReceived("WHO #mychannel")
+        logging.debug(self.getOutputtedLines(0))
+        self.failUnlessEqual(self.getOutputtedLines(0)[-4],
+                             ":localhost. 352 orospakr #mychannel orospakr localhost. irc.localnet orospakr H :0 Andrew Clunis")
+        self.failUnlessEqual(self.getOutputtedLines(0)[-3],
+                             ":localhost. 352 orospakr #mychannel msg localhost. irc.localnet my_second_guy H :0 Andrew Clunis")
+        self.failUnlessEqual(self.getOutputtedLines(0)[-2],
+                             ":localhost. 315 orospakr #mychannel :End of /WHO list.")
+

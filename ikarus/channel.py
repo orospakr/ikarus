@@ -34,3 +34,8 @@ class Channel(object):
             user.sendLine(':%s!~%s@localhost. PART #%s :%s' % (leaver.nick, leaver.name, self.name, msg))
         self.users.remove(leaver)
 
+    def whoQuery(self, user):
+        for u in self.users:
+            user.sendLine(":localhost. 352 %s #%s %s localhost. irc.localnet %s H :0 Andrew Clunis" % (user.nick, self.name, u.name,u.nick))
+        user.sendLine(":localhost. 315 %s #%s :End of /WHO list." % (user.nick, self.name))
+

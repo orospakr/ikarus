@@ -84,6 +84,12 @@ class IRC(twisted.protocols.basic.LineReceiver):
             message = line[message_start:]
             self.doQuit(message, False)
 
+        elif items[0] == "WHO":
+            channel_name_start = len("WHO ") # no +1 because there's no colon
+            channel_name = line[channel_name_start:]
+            chan = self.factory.getChannelByName(channel_name[1:])
+            chan.whoQuery(self)
+
     def doQuit(self, message, no_connection):
         if not no_connection:
             self.sendLine("ERROR :Closing Link: my_second_guy (Client Quit)")

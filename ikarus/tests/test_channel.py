@@ -136,6 +136,7 @@ class ChannelTestCase(unittest.TestCase):
         # the following message should never arrive...
         user.expects(pmock.never()).method("sendLine")
         self.c.privMsg(naughty_user, "You shouldn't be able to see this.")
+        user.verify()
 
     def testPartUser(self):
         user = pmock.Mock()
@@ -149,6 +150,7 @@ class ChannelTestCase(unittest.TestCase):
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":someone!~sone@localhost. PART #mychannel :Toodles!"))
         self.c.partUser(user, "Toodles!")
+        user.verify()
 
     def testPartUserThatHasNotJoinedThisChannel(self):
         #        :localhost. 442 orospakr #wheeeee :You're not on that channel
@@ -161,7 +163,38 @@ class ChannelTestCase(unittest.TestCase):
         user.expects(pmock.once()).sendLine(pmock.eq(
                 ":localhost. 422 unjoined_person #mychannel :You're not on that channel."))
         self.c.partUser(user, "Bye.")
+        user.verify()
 
+    def testWhoQuery(self):
+        user = pmock.Mock()
+        user.nick = "first_person"
+        user.name = "fp"
+        user.joined_channels = []
+        user.expects(pmock.once()).sendLine(pmock.eq(':first_person!~fp@localhost. JOIN :#mychannel'))
 
+        self.c.joinUser(user)
 
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 352 first_person #mychannel fp localhost. irc.localnet first_person H :0 Andrew Clunis"))
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 315 first_person #mychannel :End of /WHO list."))
+        self.c.whoQuery(user)
 
+        user2 = pmock.Mock()
+        user2.nick = "orospakr"
+        user2.name = "orospakr"
+        user2.joined_channels = []
+        user.expects(pmock.once()).sendLine(pmock.eq(':orospakr!~orospakr@localhost. JOIN :#mychannel'))
+        user2.expects(pmock.once()).sendLine(pmock.eq(':orospakr!~orospakr@localhost. JOIN :#mychannel'))
+        self.c.joinUser(user2)
+
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 352 first_person #mychannel fp localhost. irc.localnet first_person H :0 Andrew Clunis"))
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 352 first_person #mychannel orospakr localhost. irc.localnet orospakr H :0 Andrew Clunis"))
+        user.expects(pmock.once()).sendLine(pmock.eq(
+                ":localhost. 315 first_person #mychannel :End of /WHO list."))
+        self.c.whoQuery(user)
+
+        user.verify()
+        user2.verify()
