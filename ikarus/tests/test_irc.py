@@ -58,13 +58,6 @@ class IRCTestCase(unittest.TestCase):
         # from the string transport.
         return self.getOutputtedLines(num)[-2]
 
-#     def connectAnIRCClient(self):
-#         new_user = self.factory.buildProtocol(('127.0.0.1', 6667))
-#         self.users.append(new_user)
-#         new_tr = proto_helpers.StringTransport()
-#         self.trs.append(new_tr)
-#         new_user.makeConnection(new_tr)
-
     def setUp(self):
         self.factory = ikarus.irc.IRCFactory()
         #for num in range(0, 3):
@@ -137,7 +130,7 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(self.getLastOutputtedLine(0), ":localhost. 461 * USER :Not enough parameters.")
 
     def testJoinANewChannel(self):
-        self.testLogIn()
+        self.usersNeeded(1)
         self.users[0].lineReceived("JOIN #my_channel")
         # I should test the presence of channel logged in info here, once it exists
         # expect callback here.
@@ -147,13 +140,14 @@ class IRCTestCase(unittest.TestCase):
                              ":localhost. 353 " + user_fixtures[0][0] + " = #my_channel :" + user_fixtures[0][0] + "")
 
     def testMalformedChannelJoin(self):
-        self.testLogIn()
+        self.usersNeeded(1)
         self.users[0].lineReceived("JOIN")
         self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 461 * JOIN :Not enough parameters.")
 
     def testMalformedChannelPrivmsg(self):
-        self.testJoinANewChannel()
+        self.usersNeeded(1)
+        self.users[0].lineReceived("JOIN #my_channel")
         self.users[0].lineReceived("PRIVMSG #mychannel")
         self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 461 * PRIVMSG :Not enough parameters.")
@@ -165,7 +159,6 @@ class IRCTestCase(unittest.TestCase):
                              ":localhost. 451 JOIN :You have not registered.")
 
     def testNickInUseAlreadyLoggedIn(self):
-        #self.testLogIn()
         self.usersNeeded(1)
         self.connectUser() # will return a user with index 1
         self.setNick(self.users[1], "" + user_fixtures[0][0] + "")
@@ -175,7 +168,10 @@ class IRCTestCase(unittest.TestCase):
     def testPart(self):
         # make sure that the user is removed from the channel and does not receive
         # new messages.
-        self.testTwoJoinAChannel()
+        self.usersNeeded(2)
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[1].lineReceived("JOIN #mychannel")
+
         self.users[0].lineReceived("PART #mychannel :Bye bye.")
         self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":" + user_fixtures[0][0] + "!~" + user_fixtures[0][1] + "@localhost. PART #mychannel :Bye bye.")
@@ -186,7 +182,9 @@ class IRCTestCase(unittest.TestCase):
                          ":" + user_fixtures[0][0] + "!~" + user_fixtures[0][1] + "@localhost. PRIVMSG #mychannel :Lorem Ipsum...")
 
     def testMalformedPart(self):
-        self.testTwoJoinAChannel()
+        self.usersNeeded(2)
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[1].lineReceived("JOIN #mychannel")
         self.users[0].lineReceived("PART")
         self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 461 " + user_fixtures[0][0] + " PART :Not enough parameters.")
@@ -195,7 +193,7 @@ class IRCTestCase(unittest.TestCase):
         # this only tests the reception of the part message.  We assume that
         # if we got that, the test above tested the rest of the removal logic
         # sufficiently.
-        self.testLogIn()
+        self.usersNeeded(1)
         self.users[0].lineReceived("JOIN #firstchannel")
         self.users[0].lineReceived("JOIN #mychannel")
         self.users[0].lineReceived("JOIN #another_channel")
@@ -206,18 +204,9 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(lines[-2],
                              ":" + user_fixtures[0][0] + "!~" + user_fixtures[0][1] + "@localhost. PART #another_channel :I'm outta here!")
 
-#     actually, I'm not going to bother with this.  The RFC says the colon
-#     must always be there, so why bother making it flexible just because dancer is?
-#     def testPartMalformedMessageMissingColon(self):
-#         self.testLogIn()
-#         self.users[0].lineReceived("JOIN #mychannel")
-#         self.users[0].lineReceived("PART #mychannel no colon, but it should still work!")
-#         self.failUnlessEqual(self.getLastOutputtedLine(0),
-#                              ":" + user_fixtures[0][0] + "!~" + user_fixtures[0][0] + "@localhost. PART #mychannel :no colon, but it should still work!")
-
     def testPartFromNonExistentChannel(self):
         # this should be tested in this testcase.
-        self.testLogIn()
+        self.usersNeeded(1)
         self.users[0].lineReceived("PART #doesnotexist")
         self.failUnlessEqual(self.getLastOutputtedLine(0),
                              ":localhost. 403 " + user_fixtures[0][0] + " #doesnotexist :That channel doesn't exist.")
@@ -225,7 +214,9 @@ class IRCTestCase(unittest.TestCase):
     def testQuit(self):
         # make sure user is parted from all channels, as above, and can reconnect
         # without getting incorrect "nickname in use messages"
-        self.testTwoJoinAChannel()
+        self.usersNeeded(2)
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[1].lineReceived("JOIN #mychannel")
         self.failIfEqual(None,
                          self.factory.getUserByNick("" + user_fixtures[1][0] + ""))
         self.users[1].lineReceived("QUIT :bye bye!")
@@ -288,7 +279,9 @@ class IRCTestCase(unittest.TestCase):
         pass
 
     def testConnectionLost(self):
-        self.testTwoJoinAChannel()
+        self.usersNeeded(2)
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[1].lineReceived("JOIN #mychannel")
 
         from twisted.internet.main import CONNECTION_LOST
         self.users[1].connectionLost(twisted.python.failure.Failure(CONNECTION_LOST))
@@ -299,7 +292,7 @@ class IRCTestCase(unittest.TestCase):
     def testChanneListIsUpdatedOnJoin(self):
         def channelToName(c):
             return c.name
-        self.testLogIn()
+        self.usersNeeded(1)
         chans = ["mychannel", "somechannel", "anotherplace"]
         for c in chans:
             self.users[0].lineReceived("JOIN #%s" % c)
@@ -333,7 +326,8 @@ class IRCTestCase(unittest.TestCase):
         self.users[0].sendLine("lol, internet")
 
     def testGetChannelByName(self):
-        self.testJoinANewChannel()
+        self.usersNeeded(1)
+        self.users[0].lineReceived("JOIN #my_channel")
         channel = self.factory.getChannelByName("my_channel")
         self.failUnlessEqual(channel.name, "my_channel")
 
@@ -342,7 +336,9 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(channel, None)
 
     def testOneSpeaksToAnotherOnOneChannel(self):
-        self.testTwoJoinAChannel()
+        self.usersNeeded(2)
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[1].lineReceived("JOIN #mychannel")
         self.users[0].lineReceived("PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
         input2 = self.trs[1].value().split("\r\n")
         self.failUnlessEqual(input2[-2], ":" + user_fixtures[0][0] + "!~" + user_fixtures[0][1] + "@localhost. PRIVMSG #mychannel :Lorem Ipsum sit Dolor.")
@@ -355,7 +351,9 @@ class IRCTestCase(unittest.TestCase):
                              ":localhost. 422 " + user_fixtures[0][0] + " #channel :You're not on that channel.")
 
     def testWhoReturnsUserList(self):
-        self.testTwoJoinAChannel()
+        self.usersNeeded(2)
+        self.users[0].lineReceived("JOIN #mychannel")
+        self.users[1].lineReceived("JOIN #mychannel")
         self.users[0].lineReceived("WHO #mychannel")
         logging.debug(self.getOutputtedLines(0))
         self.failUnlessEqual(self.getOutputtedLines(0)[-4],
