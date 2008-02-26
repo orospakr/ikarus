@@ -5,7 +5,7 @@ iterations:
     end: Feb 23, 2008
     name: Iteration 1
     start: Feb 02, 08
-    velocity: 0.818181818181818
+    velocity: 0.909090909090909
   - !ruby/object:Iteration 
     end: ""
     name: Iteration 2
@@ -124,7 +124,7 @@ Iteration 1:
       :localhost. 352 someotherguy #mychannel ~orospakr localhost. irc.localnet someotherguy H :0 Andrew Clunis\r\n\
       :localhost. 352 someotherguy #mychannel ~orospakr localhost. irc.localnet orospakr H@ :0 Andrew Clunis\r\n\
       :localhost. 315 someotherguy #mychannel :End of /WHO list."
-    estimate: 0
+    estimate: 2
     title: Channel user lists
   - !ruby/object:Story 
     completed: false
@@ -134,6 +134,18 @@ Iteration 1:
       :localhost. PONG localhost. :someotherguy"
     estimate: 2
     title: Ping? PONG!!!11
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      TOPIC #qc :my_topic
+      
+      Should set the topic,
+      
+      whereas (method of reception?)
+      
+      (read RFC...?)
+    estimate: 1
+    title: Set and get channel topic
   - !ruby/object:Story 
     completed: false
     description: Allow users to register a permanent account by means of `/msg nickserv register`.
@@ -160,8 +172,9 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 1
     title: Daemon
-  :selected: 12
+  :selected: 17
 Iteration 2: 
+  :selected: 0
   :list: 
   - !ruby/object:Story 
     completed: false
@@ -175,6 +188,11 @@ Iteration 2:
     title: kline
   - !ruby/object:Story 
     completed: false
+    description: Mode setting a user to +o in a channel adds the user to the permanent operator list for that channel, and WHO will reply with an o bit set for that user in that channel.
+    estimate: 0
+    title: Operator status
+  - !ruby/object:Story 
+    completed: false
     description: Implement user to user CTCP messages, as per the RFC.
     estimate: 2
     title: CTCP message support
@@ -186,4 +204,13 @@ Iteration 2:
       Any user receiving too many CTCP messages will cause those messages to be dropped and logged, to prevent more distributed flood attacks.
     estimate: 2
     title: CTCP flood protection
-  :selected: 1
+  - !ruby/object:Story 
+    completed: false
+    description: |-
+      User with administrator bit set sends:
+      
+      LART <nick>
+      
+      Causes server to transmit about 1000 spurious JOIN messages with random channel names to the hapless client, along with 500 lines of random text in each one, and then kill the connection.
+    estimate: 0
+    title: LART
