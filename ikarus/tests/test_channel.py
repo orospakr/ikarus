@@ -188,6 +188,7 @@ class ChannelTestCase(unittest.TestCase):
         user.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(':first_person!~fp@localhost. JOIN :#mychannel'))
 #        user.expects(pmock.once()).sendLine(pmock.eq(':localhost.
+        user.expects(pmock.once()).sendLine(pmock.eq(':localhost. 353 first_person = #mychannel :first_person'))
         self.c.joinUser(user)
 
         user.expects(pmock.once()).sendLine(pmock.eq(
@@ -202,6 +203,7 @@ class ChannelTestCase(unittest.TestCase):
         user2.joined_channels = []
         user.expects(pmock.once()).sendLine(pmock.eq(':orospakr!~orospakr@localhost. JOIN :#mychannel'))
         user2.expects(pmock.once()).sendLine(pmock.eq(':orospakr!~orospakr@localhost. JOIN :#mychannel'))
+        user2.expects(pmock.once()).sendLine(pmock.eq(':localhost. 353 orospakr = #mychannel :first_person orospakr'))
         self.c.joinUser(user2)
 
         user.expects(pmock.once()).sendLine(pmock.eq(

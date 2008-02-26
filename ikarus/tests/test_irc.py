@@ -104,7 +104,10 @@ class IRCTestCase(unittest.TestCase):
         self.users[0].lineReceived("JOIN #my_channel")
         # I should test the presence of channel logged in info here, once it exists
         # expect callback here.
-        self.failUnlessEqual(self.getOutputtedLines(0)[-2], ":orospakr!~orospakr@localhost. JOIN :#my_channel")
+        self.failUnlessEqual(self.getOutputtedLines(0)[-3],
+                             ":orospakr!~orospakr@localhost. JOIN :#my_channel")
+        self.failUnlessEqual(self.getOutputtedLines(0)[-2],
+                             ":localhost. 353 orospakr = #my_channel :orospakr")
 
     def testMalformedChannelJoin(self):
         self.testLogIn()
