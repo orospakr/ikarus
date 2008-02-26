@@ -167,12 +167,32 @@ Iteration 1:
   - !ruby/object:Story 
     completed: false
     description: |-
+      Respond to:
+      
+      CAPAB IDENTIFY-MSG
+      
+      with:
+      
+      ...?
+      
+      Also, do I really want this feature at all?  Maybe I should just return 421 and be done with it.
+    estimate: 1
+    title: Respond to identify-msg capability request
+  - !ruby/object:Story 
+    completed: false
+    description: "Unknown commands should return a sentence in the form:\n\n\
+      :irc.questionablecontent.net 421 orosapkr CAPAB :Unknown command\n"
+    estimate: 1
+    title: Unknown commands should return err 421
+  - !ruby/object:Story 
+    completed: false
+    description: |-
       Daemonize, unless -f or --foreground is passed.
       
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 1
     title: Daemon
-  :selected: 17
+  :selected: 18
 Iteration 2: 
   :selected: 0
   :list: 

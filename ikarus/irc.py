@@ -116,8 +116,11 @@ class IRC(twisted.protocols.basic.LineReceiver):
     def doLogin(self):
         '''COME BACK HERE'''
         self.logged_in = True
-        self.sendLine(":localhost. 001 %s :Welcome to $hostname." % self.nick)
-        self.sendLine(":localhost. 002 %s :Your host is $hostname running version Ikarus" % self.nick)
+        self.sendLine(":localhost. 001 %s :Welcome to localhost." % self.nick)
+        self.sendLine(":localhost. 002 %s :Your host is localhost. running Ikarus 0.1." % self.nick)
+        self.sendLine(":localhost. 003 %s :This server was created Mon Sep 25 2006 at 21:10:26 EDT" % self.nick)
+        self.sendLine(":localhost. 004 %s localhost. Ikarus r s" % self.nick)
+        self.sendLine(":localhost. 005 %s MODES=4 CHANLIMIT=#:20 NICKLEN=16 USERLEN=10 HOSTLEN=63 TOPICLEN=450 KICKLEN=450 CHANNELLEN=30 KEYLEN=23 CHANTYPES=# PREFIX=(ov)@+ CASEMAPPING=ascii CAPAB IRCD=ikarus :are available on this server" % self.nick)
         self.sendLine("NOTICE %s :*** Your host is $hostname running version Ikarus" % self.nick)
 
     def connectionLost(self, reason):
