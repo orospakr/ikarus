@@ -75,7 +75,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
             for channel_name in channel_names:
                 channel = self.factory.getChannelByName(channel_name[1:])
                 if channel is None:
-                    self.sendLine(":localhost. 403 orospakr #doesnotexist :That channel doesn't exist.")
+                    self.sendLine(":localhost. 403 %s #doesnotexist :That channel doesn't exist." % self.nick)
                 else:
                     channel.partUser(self, message)
 
@@ -92,7 +92,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
 
     def doQuit(self, message, no_connection):
         if not no_connection:
-            self.sendLine("ERROR :Closing Link: my_second_guy (Client Quit)")
+            self.sendLine("ERROR :Closing Link: %s (Client Quit)" % self.nick)
         logging.debug("User %s is quitting, reason: %s" % (self.nick, message))
         all_users_who_care = set([])
         for chan in self.joined_channels:
@@ -118,7 +118,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
         self.logged_in = True
         self.sendLine(":localhost. 001 %s :Welcome to $hostname." % self.nick)
         self.sendLine(":localhost. 002 %s :Your host is $hostname running version Ikarus" % self.nick)
-        self.sendLine("NOTICE orospakr :*** Your host is $hostname running version Ikarus")
+        self.sendLine("NOTICE %s :*** Your host is $hostname running version Ikarus" % self.nick)
 
     def connectionLost(self, reason):
         if not self.has_quit:
@@ -130,6 +130,9 @@ class IRC(twisted.protocols.basic.LineReceiver):
             self.doQuit(reason.getErrorMessage(), True)
         else:
             logging.debug("connection was lost, with already having quit.")
+
+    def __repr__(self):
+        return "IRC object with nickname '%s'" % self.nick
 
 class IRCFactory(twisted.internet.protocol.Factory):
     protocol = IRC
@@ -157,4 +160,5 @@ class IRCFactory(twisted.internet.protocol.Factory):
         return None
 
     def unregisterUser(self, user):
+        logging.debug("Unregistering user with nick '%s'." % user.nick)
         self.users.remove(user)

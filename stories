@@ -111,7 +111,7 @@ Iteration 1:
     estimate: 2
     title: Quitting by means of TCP reset
   - !ruby/object:Story 
-    completed: false
+    completed: true
     description: "Implement the WHO verb, as per the RFC.\n\n\
       Asking client sends: WHO #<channel_name>\n\n\
       For each user (including the asking user) in the channel, lines are transmitted in the form below for each user:\n\
