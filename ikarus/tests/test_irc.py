@@ -358,11 +358,16 @@ class IRCTestCase(unittest.TestCase):
         self.users[0].lineReceived("JOIN #mychannel")
         self.users[1].lineReceived("JOIN #mychannel")
         self.users[0].lineReceived("WHO #mychannel")
-        logging.debug(self.getOutputtedLines(0))
         self.failUnlessEqual(self.getOutputtedLines(0)[-4],
                              ":localhost. 352 " + user_fixtures[0][0] + " #mychannel " + user_fixtures[0][1] + " localhost. irc.localnet " + user_fixtures[0][0] + " H :0 Andrew Clunis")
         self.failUnlessEqual(self.getOutputtedLines(0)[-3],
                              ":localhost. 352 " + user_fixtures[0][0] + " #mychannel " + user_fixtures[1][1] + " localhost. irc.localnet " + user_fixtures[1][0] + " H :0 Andrew Clunis")
         self.failUnlessEqual(self.getOutputtedLines(0)[-2],
                              ":localhost. 315 " + user_fixtures[0][0] + " #mychannel :End of /WHO list.")
+
+    def testUnknownCommand(self):
+        self.usersNeeded(1)
+        self.users[0].lineReceived("BONGHITS 42 :My head is now a giant egg!")
+        self.failUnlessEqual(self.getOutputtedLines(0)[-2],
+                             ":localhost. 421 %s BONGHITS :Unknown command" % user_fixtures[0][0])
 

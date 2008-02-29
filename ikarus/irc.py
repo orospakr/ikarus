@@ -90,6 +90,10 @@ class IRC(twisted.protocols.basic.LineReceiver):
             chan = self.factory.getChannelByName(channel_name[1:])
             chan.whoQuery(self)
 
+        else:
+            bogus_command = items[0]
+            self.sendLine(":localhost. 421 %s %s :Unknown command" % (self.nick, bogus_command))
+
     def doQuit(self, message, no_connection):
         if not no_connection:
             self.sendLine("ERROR :Closing Link: %s (Client Quit)" % self.nick)
