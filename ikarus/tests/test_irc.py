@@ -108,7 +108,8 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(input[4], ":localhost. 003 " + user_fixtures[0][0] + " :This server was created Mon Sep 25 2006 at 21:10:26 EDT")
         self.failUnlessEqual(input[5], ":localhost. 004 " + user_fixtures[0][0] + " localhost. Ikarus r s")
         self.failUnlessEqual(input[6], ":localhost. 005 " + user_fixtures[0][0] + " MODES=4 CHANLIMIT=#:20 NICKLEN=16 USERLEN=10 HOSTLEN=63 TOPICLEN=450 KICKLEN=450 CHANNELLEN=30 KEYLEN=23 CHANTYPES=# PREFIX=(ov)@+ CASEMAPPING=ascii CAPAB IRCD=ikarus :are available on this server")
-        self.failUnlessEqual(input[7], "NOTICE " + user_fixtures[0][0] + " :*** Your host is $hostname running version Ikarus")
+        self.failUnlessEqual(input[7], ":localhost. 422 " + user_fixtures[0][0] + " :MOTD file is missing.")
+        self.failUnlessEqual(input[8], "NOTICE " + user_fixtures[0][0] + " :*** Your host is $hostname running version Ikarus")
         self.failUnlessEqual(self.users[0].logged_in, True)
 
     def testConnectionNotOpenedWithOnlyNick(self):
