@@ -192,8 +192,9 @@ Iteration 1:
       -f and --f maybe should implicitly set logging to verbose.
     estimate: 1
     title: Daemon
-  :selected: 17
+  :selected: 2
 Iteration 2: 
+  :selected: 0
   :list: 
   - !ruby/object:Story 
     completed: false
@@ -233,4 +234,3 @@ Iteration 2:
       Causes server to transmit about 1000 spurious JOIN messages with random channel names to the hapless client, along with 500 lines of random text in each one, and then kill the connection.
     estimate: 0
     title: LART
-  :selected: 0

@@ -6,6 +6,7 @@ import logging
 import ikarus.channel
 
 class IRC(twisted.protocols.basic.LineReceiver):
+    
 
     def __init__(self):
         #twisted.protocols.basic.LineOnlyReceiver.__init__(self)
@@ -17,6 +18,7 @@ class IRC(twisted.protocols.basic.LineReceiver):
         self.has_quit = False
 
     def lineReceived(self, line):
+#        logging.debug("line recv'd '%s'" % line)
         items = line.split(" ")
         if items[0] == "NICK":
             if len(items) == 1:

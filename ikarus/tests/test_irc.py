@@ -372,3 +372,9 @@ class IRCTestCase(unittest.TestCase):
         self.failUnlessEqual(self.getOutputtedLines(0)[-2],
                              ":localhost. 421 %s BONGHITS :Unknown command" % user_fixtures[0][0])
 
+#     def testmIRCIsADoucheBag(self):
+#         # some clients only send 0x0a (LF) instead of 0x0d 0x0a (CRLF)
+#         self.usersNeeded(1, log_them_in=False)
+#         self.users[0].dataReceived("NICK orospakr" + chr(0x0a))
+#         self.users[0].dateReceived("USER oro oro oro :Someone." + chr(0x0a))
+
